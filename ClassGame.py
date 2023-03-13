@@ -9,5 +9,14 @@ import tkinter.font as font
 class Lettre:
 
 	def __init__(self,lettre,gameWindow,LetterButtonFont):
-		self.boutton = Button(gameWindow,text="".join(lettre),width = 4, height = 3, font = LetterButtonFont, bg="#9090EE",activebackground="#A3A3FE",bd=0)
+		self.lettre = lettre
+		self.boutton = Button(gameWindow,text="".join(lettre),
+			width = 3, height = 1, font = LetterButtonFont,
+			 bg="#9090EE",activebackground="#A3A3FE",bd=0,
+			 command = self.afficher)
+		
+	def afficher(self):
+		print(self.lettre)
+
+
 
