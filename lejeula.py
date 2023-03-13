@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter.font as font
 from ClassGame import Lettre
 
+# C'est la map qui contiendras les lettres
 gameMap = [ ["A","B","G","N","I","Z"],
 			["B","H","Y","A","W","Q"],
 			["H","R","D","T","P","O"],
@@ -11,31 +12,30 @@ gameMap = [ ["A","B","G","N","I","Z"],
 			["X","T","S","L","G","Y"],
 			]
 
+# Initialisation de la fenetre du jeu
 gameWindow = Tk()
-gameWindow.title("lejeula")
-gameWindow.geometry("800x800")
+gameWindow.title("Mot Croisé") # Titre du jeu
+gameWindow.geometry("800x800") # Dimmension de la fenetre
+gameWindow.configure(bg="#45458B")
 
 
-#Leave button
+# Boutton pour quitter la partie
 leaveBtn = Button(gameWindow,text="Quitter",bg = "red",fg = "white",command=gameWindow.destroy)
-leaveBtn.place(x=700,y=600)
+leaveBtn.place(x=700,y=600) # emplacement forcé sur des pixel précis
 
-# Buttons fonts
-LetterButtonFont = font.Font(size=20)
-LeaveButtonFont = font.Font(size=10)
+# Ceci sont les font,taille de font que je vais utiliser pour les différents boutton
+LetterButtonFont = font.Font(size=20) # font size pour les Lettre
+LeaveButtonFont = font.Font(size=10) # font size pour le boutton quitter
 
-
-# boutton
-#generating the map
-
-posy = 0
-for x in range(len(gameMap[0])):
-	posx = 0
-	posy += 115
-	for y in range(len(gameMap)):
-		lettre = Lettre(gameMap[x][y],gameWindow,LetterButtonFont)
-		lettre.boutton.place(x=posx, y=posy)
-		posx+=100
+# génération de la map
+posy = 20 # position y du boutton de la lettre
+for x in range(len(gameMap[0])): # on parcours la map en x
+	posx = 20 # La position initiale de chaque boutton en x est donc 0 pour la premiere ligne
+	for y in range(len(gameMap)): # On parcours la map en y
+		lettre = Lettre(gameMap[x][y],gameWindow,LetterButtonFont) # on initialise les lettre grasse à la classe Lettre
+		lettre.boutton.place(x=posx, y=posy) # on place le boutton de la lettre qui correspond à la position gameMap[x][y]
+		posx+=100 # On incrémente de 100 la position en x pour laisser quelques pixels pour d'écart en horizontal
+	posy += 115 # On incrémente de 115 la position en y pour laisser un espace de quelques pixels d'écart en vertical
 
 gameWindow.mainloop()
 
