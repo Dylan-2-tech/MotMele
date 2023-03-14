@@ -55,22 +55,57 @@ class Lettre:
 
 	def __init__(self,lettre,x,y,gameWindow):
 		self.gameMap = gameWindow.gameMap
-		self.isCliqued = False
-		self.x = x
-		self.y = y
+		self.isCliqued = False # Si il est cliqué alors
+		self.x = x # position x de la lettre
+		self.y = y # position y de la lettre
 		self.lettre = lettre
 		self.boutton = Button(gameWindow.gameWindow,text="".join(lettre),
 			width = 3, height = 1, font = font.Font(size=20),
 			bg="#9090EE", activebackground="#A3A3FE", bd=0,
 			command=self.clicked)
 
-	def clicked(self):
-		self.boutton.configure(bg = "red",activebackground="red")
+
+	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 		if self.isCliqued:
-			print(f"La lettre {self.gameMap[self.x][self.y].lettre} est déjà selectionné")
+			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
+			self.isCliqued = False
 		else:
-			print(f"La lettre {self.lettre} a été cliqué à la position ({self.x},{self.y})")
-		self.isCliqued = True
+			self.boutton.configure(bg = "red",activebackground="red")
+			self.isCliqued = True
+
+
+	"""
+	Comment faire en sorte que le joueur ne clique pas sur des lettres impossible à choisir
+
+	Définir une lettre choisissable:
+		-si la lettre se trouve dans un périmètre de 1 dans toutes les directions 
+		par rapport à la position x et y de la lettre.
+
+	Comment trouver les lettres choisissable:
+
+	Direction GAUCHE, HAUT, DROITE, BAS:
+		- si self.x est strictement supérieure à 0 alors la lettre à gauche est en position:
+			--> self.gameMap[x-1][y]
+		- si self.y est strictement supérieure à 0 alors la lettre du dessus est en position:
+			--> self.gameMap[x][y-1]
+		- si self.x est strictement inférieur à len(self.gameMap[0])-1 alors la lettre de droite est en position:
+			--> self.gameMap[x+1][y]
+		- si self.y est strictement inférieur à len(self.gameMap)-1 alors la lettre du dessus est en position:
+			--> self.gameMap[x][y+1]
+	
+	Direction en diagonale:
+		- si self.x est strictement supérieure à 0 et
+		  si self.y est strictement supérieure à 0 alors la lettre en haut à droite est en position:
+			--> self.gameMap[x-1][y-1]
+		- si self.x est strictement inférieur à len(self.gameMap[0])-1 et
+		  si self.y est strictement supérieure à 0 alors la lettre en haut à gauche est en position:
+		  	--> self.gameMap[x+1][y-1]
+		- si self.x est strictement supérieur à 0 et
+		  si self.y est strictement inférieure à len(self.gameMap)-1 
+		  alors la lettre en bas à gauche est en position:
+		    --> self.gameMap[]
+	"""
+
 
 
 
