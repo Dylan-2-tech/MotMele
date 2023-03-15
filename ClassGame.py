@@ -34,7 +34,6 @@ class Jeu:
 		self.gameWindow.minsize(width = 1200, height = 650) # Dimmension minimum de la fenetre
 		self.gameWindow.maxsize(width = 1200, height = 650) # Dimmension maximale de la fenetre
 		self.gameWindow.configure(bg="#45458B")
-		self.mot = ""
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = Button(self.gameWindow, text = "Valider", bg = "green", fg = "white")
@@ -44,6 +43,14 @@ class Jeu:
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self.gameWindow,text="Quitter",bg = "red",fg = "white",command=self.gameWindow.destroy, font = font.Font(size=15))
 		self.leaveBtn.place(x = 900, y = 420) # emplacement forcé sur des pixel précis
+
+
+		# Label qui affiche le mot valider
+		self.MotLabel = Label(self.gameWindow,text = "")
+
+
+		# Mot qui va changer au fur et à mesure de la partie
+		self.mot = Mot(self.MotLabel)
 
 
 		# génération de la map
@@ -66,7 +73,7 @@ class Lettre:
 	def __init__(self,lettre,x,y,game):
 
 		self.index = -1
-		self.game = game
+		self.mot = game.mot
 		self.gameWindow = game.gameWindow
 		self.gameMap = game.gameMap # la map où apparaissent les lettre
 		self.isClicked = False # Si il est cliqué alors
@@ -85,14 +92,14 @@ class Lettre:
 		if self.isClicked:
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 			self.isClicked = False
-			self.game.mot = ''.join([self.game.mot[i] for i in range(len(self.game.mot)) if i != self.index]) 
+			self.mot.mot = [self.mot.mot[i] for i in range(len(self.mot.mot)) if self != self.mot.mot[i]]
 		else:
-			self.game.mot += self.lettre
-			self.index = len(self.game.mot)-1
+			self.mot.ajouterLettre(self)
+			self.index = len(self.mot.mot)-1
 			self.boutton.configure(bg = "red",activebackground="red")
 			self.isClicked = True
 
-		print(f"le mot est {self.game.mot} et la lettre {self.lettre} est à l'index {self.index}")
+		print(f"le mot est {self.mot.afficherMot()}")
 
 
 
@@ -139,15 +146,16 @@ class Lettre:
 class Mot:
 
 	def __init__(self,displayLabel):
-		self.mot = ""
+		self.mot = []
 		self.displayLabel = displayLabel
 		self.direction = None
 
 	def ajouterLettre(self, lettre):
-		self.mot += lettre.lettre
+		self.mot.append(lettre)
 
 	def afficherMot(self):
-		self.displayLabel.set(self.mot)
+		return [self.mot[i].lettre for i in range(len(self.mot))]
+		#self.displayLabel.set(self.mot)
 
 
 	"""
