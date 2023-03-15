@@ -80,7 +80,7 @@ class Lettre:
 
 
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
-
+		print(f"la lettre {self.lettre} est cliqué")
 		if self.isCliqued:
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 			self.isCliqued = False
