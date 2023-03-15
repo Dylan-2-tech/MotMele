@@ -2,6 +2,15 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.font as font
 
+# Constante des différentes directions
+DIAGONALE_GD = "diagonale_gauche_droite"
+DIAGONALE_DG = "diagonale_droite_gauche"
+LIGNE_HORIZONTAL = "ligne_horizontale"
+LIGNE_VERTICAL = "ligne_verticale"
+
+
+
+
 #### Fichier des class du jeu ####
 
 # Class De la fenetre de jeu
@@ -9,20 +18,23 @@ class Jeu:
 
 	def __init__(self):
 		# C'est la map qui contiendras les lettres
-		self.gameMap = [ ["A","B","G","N","I","Z","Y","I"],
+		self.gameMap = [ 
+					["A","B","G","N","I","Z","Y","I"],
 					["B","H","Y","A","W","Q","U","A"],
 					["H","R","D","T","P","O","V","W"],
 					["L","J","G","Z","I","M","R","F"],
 					["E","X","B","N","K","M","T","Y"],
-					["X","T","S","L","G","Y","H","O"]]
+					["X","T","S","L","G","Y","H","O"],
+					["V","J","A","R","O","Y","F","P"],
+					["P","M","H","E","I","M","A","U"]]
 
 
 		# Initialisation de la fenetre du jeu
 		self.gameWindow = Tk()
 		self.gameWindow.title("Mot Croisé") # Titre du jeu
-		self.gameWindow.geometry("1000x500+400+250") # Dimmension de la fenetre
-		self.gameWindow.minsize(width = 1000, height = 500) # Dimmension minimum de la fenetre
-		self.gameWindow.maxsize(width = 1000, height = 500) # Dimmension maximale de la fenetre
+		self.gameWindow.geometry("1200x650+400+250") # Dimmension de la fenetre
+		#self.gameWindow.minsize(width = 1200, height = 1000) # Dimmension minimum de la fenetre
+		#self.gameWindow.maxsize(width = 1200, height = 1000) # Dimmension maximale de la fenetre
 		self.gameWindow.configure(bg="#45458B")
 
 		# Boutton pour valider la sélection des lettres
@@ -54,7 +66,9 @@ class Jeu:
 class Lettre:
 
 	def __init__(self,lettre,x,y,gameWindow):
-		self.gameMap = gameWindow.gameMap
+
+		self.gameWindow = gameWindow.gameWindow
+		self.gameMap = gameWindow.gameMap # la map où apparaissent les lettre
 		self.isCliqued = False # Si il est cliqué alors
 		self.x = x # position x de la lettre
 		self.y = y # position y de la lettre
@@ -66,12 +80,14 @@ class Lettre:
 
 
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
+
 		if self.isCliqued:
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 			self.isCliqued = False
 		else:
 			self.boutton.configure(bg = "red",activebackground="red")
 			self.isCliqued = True
+
 
 
 	"""
@@ -103,10 +119,12 @@ class Lettre:
 		- si self.x est strictement supérieur à 0 et
 		  si self.y est strictement inférieure à len(self.gameMap)-1 
 		  alors la lettre en bas à gauche est en position:
-		    --> self.gameMap[]
+		    --> self.gameMap[x-1][y+1]
+		- si self.x est strictement inférieur à len(self.gameMap[0])-1 et
+		  si self.y est strictement inférieur à len(self.gameMap)-1
+		  alors la lettre en bas à droite est en position:
+		  	--> self.gameMap[x+1][y+1]
 	"""
-
-
 
 
 # Class du mot qui sera créé au fur et à mesure
@@ -115,9 +133,32 @@ class Mot:
 	def __init__(self,displayLabel):
 		self.mot = ""
 		self.displayLabel = displayLabel
+		self.direction = None
 
 	def ajouterLettre(self, lettre):
-		self.lettres += lettre
+		self.mot += lettre.lettre
 
 	def afficherMot(self):
 		self.displayLabel.set(self.mot)
+
+	"""
+	La direction du mot est diagonale gauche droite si
+	on peut cliquer sur la lettre choisis et que ses coordonnées sont
+	self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y-1
+	ou self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y-1
+
+	La direction du mot est diagonale droite gauche si
+	on peut cliquer sur la lettre choisis et que ses coordonnées sont
+	self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y+1
+	ou self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y-1
+
+	La direction du mot est verticale si
+	on peut cliquer sur la lettre choisis et que ses coordonnées sont
+	self.mot[len(mot)-1].x et self.mot[len(mot)-1].y-1 
+	ou self.mot[len(mot)-1].x et self.mot[len(mot)-1].y+1
+
+	La direction du mot est horizontale si
+	on peut cliquer sur la lettre choisis et que ses coordonnées sont
+	self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y
+	ou self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y
+	"""
