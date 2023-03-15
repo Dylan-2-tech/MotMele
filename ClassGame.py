@@ -9,8 +9,6 @@ LIGNE_HORIZONTAL = "ligne_horizontale"
 LIGNE_VERTICAL = "ligne_verticale"
 
 
-
-
 #### Fichier des class du jeu ####
 
 # Class De la fenetre de jeu
@@ -19,7 +17,7 @@ class Jeu:
 	def __init__(self):
 		# C'est la map qui contiendras les lettres
 		self.gameMap = [ 
-					["A","B","G","N","I","Z","Y","I"],
+					["P","B","G","N","I","Z","Y","I"],
 					["B","H","Y","A","W","Q","U","A"],
 					["H","R","D","T","P","O","V","W"],
 					["L","J","G","Z","I","M","R","F"],
@@ -33,9 +31,10 @@ class Jeu:
 		self.gameWindow = Tk()
 		self.gameWindow.title("Mot Croisé") # Titre du jeu
 		self.gameWindow.geometry("1200x650+400+250") # Dimmension de la fenetre
-		#self.gameWindow.minsize(width = 1200, height = 1000) # Dimmension minimum de la fenetre
-		#self.gameWindow.maxsize(width = 1200, height = 1000) # Dimmension maximale de la fenetre
+		self.gameWindow.minsize(width = 1200, height = 650) # Dimmension minimum de la fenetre
+		self.gameWindow.maxsize(width = 1200, height = 650) # Dimmension maximale de la fenetre
 		self.gameWindow.configure(bg="#45458B")
+		self.mot = ""
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = Button(self.gameWindow, text = "Valider", bg = "green", fg = "white")
@@ -58,22 +57,23 @@ class Jeu:
 				posx+=75 # On incrémente de 100 la position en x pour laisser quelques pixels pour d'écart en horizontal
 			posy += 75 # On incrémente de 115 la position en y pour laisser un espace de quelques pixels d'écart en vertical
 
-
 		self.gameWindow.mainloop()
 
 
 # Class des lettres
 class Lettre:
 
-	def __init__(self,lettre,x,y,gameWindow):
+	def __init__(self,lettre,x,y,game):
 
-		self.gameWindow = gameWindow.gameWindow
-		self.gameMap = gameWindow.gameMap # la map où apparaissent les lettre
-		self.isCliqued = False # Si il est cliqué alors
+		self.index = -1
+		self.game = game
+		self.gameWindow = game.gameWindow
+		self.gameMap = game.gameMap # la map où apparaissent les lettre
+		self.isClicked = False # Si il est cliqué alors
 		self.x = x # position x de la lettre
 		self.y = y # position y de la lettre
 		self.lettre = lettre
-		self.boutton = Button(gameWindow.gameWindow,text="".join(lettre),
+		self.boutton = Button(self.gameWindow,text="".join(lettre),
 			width = 3, height = 1, font = font.Font(size=20),
 			bg="#9090EE", activebackground="#A3A3FE", bd=0,
 			command=self.clicked)
@@ -81,12 +81,20 @@ class Lettre:
 
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 		print(f"la lettre {self.lettre} est cliqué")
-		if self.isCliqued:
+
+		if self.isClicked:
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
-			self.isCliqued = False
+			self.isClicked = False
+			self.game.mot = ''.join([self.game.mot[i] for i in range(len(self.game.mot)) if i != self.index]) 
 		else:
+			self.game.mot += self.lettre
+			self.index = len(self.game.mot)-1
 			self.boutton.configure(bg = "red",activebackground="red")
-			self.isCliqued = True
+			self.isClicked = True
+
+		print(f"le mot est {self.game.mot} et la lettre {self.lettre} est à l'index {self.index}")
+
+
 
 
 
@@ -140,6 +148,7 @@ class Mot:
 
 	def afficherMot(self):
 		self.displayLabel.set(self.mot)
+
 
 	"""
 	La direction du mot est diagonale gauche droite si
