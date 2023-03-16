@@ -64,6 +64,19 @@ class Jeu:
 				posx+=75 # On incrémente de 100 la position en x pour laisser quelques pixels pour d'écart en horizontal
 			posy += 75 # On incrémente de 115 la position en y pour laisser un espace de quelques pixels d'écart en vertical
 
+
+		# Le bouton qui va deséléctionné toutes les lettres
+		self.ClearLettersBtn = Button(self.gameWindow,text = "Clear", command = None)
+		self.ClearLettersBtn.place(x = 800, y = 420)
+
+		def clear(self):
+			for listeLettre in self.gameMap:
+				for lettre in listeLettre:
+					if lettre.isClicked:
+						lettre.isClicked = False
+						lettre.boutton.confgure(bg = "#9090EE",activebackground="#A3A3FE")
+
+
 		self.gameWindow.mainloop()
 
 
@@ -88,7 +101,7 @@ class Lettre:
 
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 
-		if self.isClicked: # Si la lettre est cliqué
+		if self.isClicked: # Si la lettre est déja cliqué
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 			self.isClicked = False
 			self.mot.mot = [self.mot.mot[i] for i in range(len(self.mot.mot)) if self != self.mot.mot[i]]
@@ -100,34 +113,36 @@ class Lettre:
 				self.index = len(self.mot.mot)-1
 				self.boutton.configure(bg = "red",activebackground="red")
 				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué")
+				print(f"la lettre {self.lettre} est cliqué en haut de la lettre {self.gameMap[self.x+1][self.y].lettre}")
 
-			# Si la lettre de gauche est cliqué
+			# Si la lettre en bas est cliqué par rapport à celle de droite
 			elif self.x-1 > 0 and self.gameMap[self.x-1][self.y].isClicked:
 				self.mot.ajouterLettre(self)
 				self.index = len(self.mot.mot)-1
 				self.boutton.configure(bg = "red",activebackground="red")
 				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué")
+				print(f"la lettre {self.lettre} est cliqué en bas de la lettre {self.gameMap[self.x-1][self.y].lettre}")
 
-			# Si la lettre en bas est cliqué
-			elif self.y+1 > 0 and self.gameMap[self.x][self.y+1].isClicked:
+			# Si la lettre à gauche est cliqué par rapport à celle de droite 
+			elif self.y+1 < len(self.gameMap) and self.gameMap[self.x][self.y+1].isClicked:
 				self.mot.ajouterLettre(self)
 				self.index = len(self.mot.mot)-1
 				self.boutton.configure(bg = "red",activebackground="red")
 				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué")
+				print(f"la lettre {self.lettre} est cliqué à gauche de la lettre {self.gameMap[self.x][self.y+1].lettre}")
 
-			# Si la lettre en haut est cliqué
-			elif self.y-1 < len(self.gameMap) and self.gameMap[self.x][self.y-1].isClicked:
+			# Si la lettre à droite est cliqué par rapport à celle de gauche
+			elif self.y-1 > 0 and self.gameMap[self.x][self.y-1].isClicked:
 				self.mot.ajouterLettre(self)
 				self.index = len(self.mot.mot)-1
 				self.boutton.configure(bg = "red",activebackground="red")
 				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué")
+				print(f"la lettre {self.lettre} est cliqué à droite de {self.gameMap[self.x][self.y-1].lettre}")
 
 			else:
+				self.mot.ajouterLettre(self)
 				self.boutton.configure(bg = "red",activebackground="red")
+				self.isClicked = True
 				
 
 			# Si la lettre en haut à gauche est cliqué
