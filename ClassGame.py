@@ -42,17 +42,22 @@ class Jeu(Tk):
 			if self.mot.mot_correct(): # Si le mot est correct
 				indMot = 0
 				trouve = False
-
 				while not trouve and indMot < len(self.listeMot): # On recherche le mot pour savoir si le joueur à trouvé le bon
 					trouve = self.listeMot[indMot] == self.mot.get_mot() # True si le mot est dans la liste
 					indMot += 1
+
 				if trouve: # Si on la trouvé
 					self.MotLabel.configure(text = "Vous avez trouvé le mot !")
+					self.mot.valider_mot()
 				else: # Si on la pas trouvé
 					self.MotLabel.configure(text = "Vous avez pas trouvé le bon mot :/")
+					clear(self)
 
 			else: # Si le mot n'est pas correct
 				self.MotLabel.configure(text = "Le mot n'est pas valide")
+				clear(self)
+
+			self.mot.clear_mot()
 
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
@@ -71,10 +76,10 @@ class Jeu(Tk):
 
 		# Fonction qui nettoie les lettres sélectionner mais pas validé
 		def clear(self):
+			self.mot.clear_mot()
 			for listeLettre in self.gameMap:
 				for lettre in listeLettre:
-					if lettre.isClicked:
-						self.mot.text = []
+					if lettre.isClicked and not lettre.isValid:
 						lettre.isClicked = False
 						lettre.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 
@@ -100,7 +105,7 @@ class Lettre:
 
 		self.MotLabel = game.MotLabel
 		self.mot = game.mot
-		self.valide = False
+		self.isValid = False # Si le mot est validé
 		self.isClicked = False # Si il est cliqué alors
 		self.x = x # position x de la lettre
 		self.y = y # position y de la lettre
@@ -112,17 +117,18 @@ class Lettre:
 	
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 
-		if self.isClicked and not self.valide: # Si la lettre est déja cliqué
+		if self.isClicked and not self.isValid: # Si la lettre est déja cliqué et pas validé
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE") # On remet une couleur par défaut 
 			self.isClicked = False # Elle devient plus cliqué
 			self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
-			self.MotLabel.configure(text = self.mot) # Affichage du mot
+			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
 		
-		else: # Si la lettre n'est pas encore cliqué
+		elif not self.isClicked and not self.isValid: # Si la lettre n'est pas encore cliqué et quelle est pas validé
 			self.boutton.configure(bg = "#995AD1",activebackground="#995AD1") # On change sa couleur pour dire qu'elle est cliqué
 			self.isClicked = True # Elle devient cliqué
 			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
-			self.MotLabel.configure(text = self.mot) # Affichage du mot
+			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
 
 
 # Class du mot
@@ -136,6 +142,13 @@ class Mot:
 
 	def get_mot(self):
 		return "".join(self.text[i].lettre for i in range(len(self.text)))
+
+	def clear_mot(self):
+		self.text = []
+
+	def valider_mot(self):
+		for lettre in self.text:
+			lettre.isValid = True
 
 	def ajouter_Lettre(self, lettre):
 		self.text.append(lettre)
