@@ -11,6 +11,7 @@ class Jeu(Tk):
 	def __init__(self):
 		super().__init__()
 
+		# Map du jeu
 		self.gameMap = [ 
 					["P","O","U","R","I","Z","Y","I"],
 					["B","H","S","A","W","Q","U","A"],
@@ -21,6 +22,8 @@ class Jeu(Tk):
 					["V","J","A","R","O","Y","F","P"],
 					["P","M","H","E","I","M","A","U"]
 					]
+
+		self.listeMot = ["POUR","IRIS"] # Liste de mot à trouvé dans la map
 
 		# Initialisation de la fenetre du jeu
 		self.title("Mot Mélé") # Titre du jeu
@@ -35,7 +38,21 @@ class Jeu(Tk):
 
 		# Méthode Valider
 		def valider(self):
-			self.MotLabel.configure(text = self.mot.mot_correct())
+
+			if self.mot.mot_correct(): # Si le mot est correct
+				indMot = 0
+				trouve = False
+
+				while not trouve and indMot < len(self.listeMot): # On recherche le mot pour savoir si le joueur à trouvé le bon
+					trouve = self.listeMot[indMot] == self.mot.get_mot() # True si le mot est dans la liste
+					indMot += 1
+				if trouve: # Si on la trouvé
+					self.MotLabel.configure(text = "Vous avez trouvé le mot !")
+				else: # Si on la pas trouvé
+					self.MotLabel.configure(text = "Vous avez pas trouvé le bon mot :/")
+
+			else: # Si le mot n'est pas correct
+				self.MotLabel.configure(text = "Le mot n'est pas valide")
 
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
@@ -81,7 +98,9 @@ class Lettre:
 
 	def __init__(self,lettre,x,y,game):
 
+		self.MotLabel = game.MotLabel
 		self.mot = game.mot
+		self.valide = False
 		self.isClicked = False # Si il est cliqué alors
 		self.x = x # position x de la lettre
 		self.y = y # position y de la lettre
@@ -93,24 +112,29 @@ class Lettre:
 	
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 
-		if self.isClicked: # Si la lettre est déja cliqué
+		if self.isClicked and not self.valide: # Si la lettre est déja cliqué
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE") # On remet une couleur par défaut 
 			self.isClicked = False # Elle devient plus cliqué
 			self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
+			self.MotLabel.configure(text = self.mot) # Affichage du mot
 		
 		else: # Si la lettre n'est pas encore cliqué
-			self.boutton.configure(bg = "red",activebackground="red") # On change sa couleur pour dire qu'elle est cliqué
+			self.boutton.configure(bg = "#995AD1",activebackground="#995AD1") # On change sa couleur pour dire qu'elle est cliqué
 			self.isClicked = True # Elle devient cliqué
 			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
+			self.MotLabel.configure(text = self.mot) # Affichage du mot
 
 
-# Class du mot qui sera créé au fur et à mesure
+# Class du mot
 class Mot:
 
 	def __init__(self):
 		self.text = []
 
 	def __str__(self):
+		return "".join(self.text[i].lettre for i in range(len(self.text)))
+
+	def get_mot(self):
 		return "".join(self.text[i].lettre for i in range(len(self.text)))
 
 	def ajouter_Lettre(self, lettre):
@@ -133,19 +157,19 @@ class Mot:
 		On soustrain 1 au deux coordonnées et on place d'abord les y puis les x.
 		"""
 
-		if len(self.text) > 1:
-			if self.mot_horizontal():
-				return "mot horizontal"
-			elif self.mot_vertical():
-				return "mot vertical"
-			elif self.mot_diagonale_gauche_droite():
-				return "mot en diagonale de gauche à droite"
-			elif self.mot_diagonale_droite_gauche():
-				return "mot en diagonale de droite à gauche"
-			else:
-				return "pas un mot"
-		else:
-			return "Composé un mot"
+		if len(self.text) > 1: # Si le mot a plus de une seule lettre
+			if self.mot_horizontal(): # Si le mot est horizontal
+				return True
+			elif self.mot_vertical(): # Si le mot est vertical
+				return True
+			elif self.mot_diagonale_gauche_droite(): # Si le mot est en diagonale de gauche à droite
+				return True
+			elif self.mot_diagonale_droite_gauche(): # Si le mot est en diagonale de droite à gauche
+				return True
+			else: # Si le mot n'est pas bien formé
+				return False
+		else: # Si le mot est composé de qu'une seule lettre
+			return False
 	
 
 	def mot_horizontal(self):
