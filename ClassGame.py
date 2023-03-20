@@ -59,22 +59,16 @@ class Jeu(Tk):
 			for y in range(len(self.gameMap[0])): # On parcours la map en y
 				lettre = Lettre(self.gameMap[x][y],x,y,self) # on initialise les lettre grâce à la classe Lettre
 				lettre.boutton.place(x=posx, y=posy) # on place le boutton de la lettre qui correspond à la position gameMap[x][y]
-				self.gameMap[x][y] = lettre
+				####self.gameMap[x][y] = lettre
 				posx+=75 # On incrémente de 100 la position en x pour laisser quelques pixels pour d'écart en horizontal
 			posy += 75 # On incrémente de 115 la position en y pour laisser un espace de quelques pixels d'écart en vertical
 
 		self.mainloop() # Affichage de la fenetre
 
 		"""
-		
 		# Le bouton qui va deséléctionné toutes les lettres
 		self.ClearLettersBtn = Button(self.gameWindow,text = "Clear", command = None)
 		self.ClearLettersBtn.place(x = 800, y = 420)
-
-
-		# Fonction Valider
-		def Valider(self):
-			print(self.mot)
 
 
 		# Fonction qui nettoie les lettres sélectionner mais pas validé
@@ -126,42 +120,6 @@ class Lettre:
 			self.boutton.configure(bg = "red",activebackground="red") # On change sa couleur pour dire qu'elle est cliqué
 			self.isClicked = True # Elle devient cliqué
 			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
- 	
-	"""
-	Comment faire en sorte que le joueur ne clique pas sur des lettres impossible à choisir
-
-	Définir une lettre choisissable:
-		-si la lettre se trouve dans un périmètre de 1 dans toutes les directions 
-		par rapport à la position x et y de la lettre.
-
-	Comment trouver les lettres choisissable:
-
-	Direction GAUCHE, HAUT, DROITE, BAS:
-		- si self.x est strictement supérieure à 0 alors la lettre à gauche est en position:
-			--> self.gameMap[x-1][y]
-		- si self.y est strictement supérieure à 0 alors la lettre du dessus est en position:
-			--> self.gameMap[x][y-1]
-		- si self.x est strictement inférieur à len(self.gameMap[0])-1 alors la lettre de droite est en position:
-			--> self.gameMap[x+1][y]
-		- si self.y est strictement inférieur à len(self.gameMap)-1 alors la lettre du dessus est en position:
-			--> self.gameMap[x][y+1]
-	
-	Direction en diagonale:
-		- si self.x est strictement supérieure à 0 et
-		  si self.y est strictement supérieure à 0 alors la lettre en haut à droite est en position:
-			--> self.gameMap[x-1][y-1]
-		- si self.x est strictement inférieur à len(self.gameMap[0])-1 et
-		  si self.y est strictement supérieure à 0 alors la lettre en haut à gauche est en position:
-		  	--> self.gameMap[x+1][y-1]
-		- si self.x est strictement supérieur à 0 et
-		  si self.y est strictement inférieure à len(self.gameMap)-1 
-		  alors la lettre en bas à gauche est en position:
-		    --> self.gameMap[x-1][y+1]
-		- si self.x est strictement inférieur à len(self.gameMap[0])-1 et
-		  si self.y est strictement inférieur à len(self.gameMap)-1
-		  alors la lettre en bas à droite est en position:
-		  	--> self.gameMap[x+1][y+1]
-	"""
 
 
 # Class du mot qui sera créé au fur et à mesure
@@ -177,141 +135,67 @@ class Mot:
 		self.text.append(lettre)
 
 	def mot_correct(self):
-		"""Renvoie True si chaque lettre du mot suivent la même direction"""
+		"""Renvoie True si chaque lettre du mot suivent la même direction.
+
+		En mathématiques, (x,y) sont les coordonnées basiques d'un graphe pour trouver un point.
+		En informatique lorsqu'on veux créer une map en 2D n ne peut pas utiliser cette représentation
+		des positions des objet que l'on veut placer dans la map.
+		Une "MAP" en info c'est une liste de liste.
+		Supposons que nous avons une map comme la suivante:
+
+			Map = [["a","b","c","d"],
+				   ["e","f","g","h"],
+				   ["i","j","k","l"]]
+
+		En graphe le point à la position (3,4) est "l" mais en informatique c'est Map[3][2].
+		On soustrain 1 au deux coordonnées et on place d'abord les y puis les x.
+		"""
 
 		if len(self.text) > 1:
-
-			startX = self.text[0].x+1 # Position x pour comparer les positions avec self.text[i].x
-			startY = self.text[0].y+1 # Position y pour comparer les positions avec self.text[i].y
-			indLetter = 1 # Indice de départ pour comparais les lettres
-			wellFormed = False # Booléen qui va confirmé si le mot est mal formé
-
-			# Si toutes les lettres sont positionné horizontalement
-			while not wellFormed and indLetter < len(self.text):
-				wellFormed = self.text[indLetter].x == startX and self.text[indLetter].y == startY
-				if indLetter == len(self.text)-1:
-					return f"mot horizontal {indLetter}"
-				else:
-					startX += 1
-					indLetter += 1
-
-			if wellFormed:
-				return "Mot horizontal"
+			if self.mot_horizontal():
+				return "mot horizontal"
+			elif self.mot_vertical():
+				return "mot vertical"
 			else:
-				return "mot pas horizontale"
-
+				return "mot ni vert ni hoz"
 		else:
-			return "Pas un mot"
+			return "pas un mot"
+	
 
+	def mot_horizontal(self):
+		# Si toutes les lettres sont positionné horizontalement
 
-		"""
-		# Si le mot est bien formé horizontalement
-		# On réinitialise les valeurs de comparaisons
-		startX = self.text[0].x+1 # Position x pour comparer les positions avec self.text[i].x
-		indLetter = 1 # Indice de départ pour comparais les lettres
+		startX = self.text[0].x # Position x pour comparer les positions avec self.text[indLetter].x
+		startY = self.text[0].y # Position y pour comparer les positions avec self.text[indLetter].y
+		indLetter = 1 # Indice pour comparer les position entre lettres. On commence avec la 2ème lettre car startX et startY sont les position de la première lettre
+		wellFormed = True # Booléen pour entrer dans la boucle 
 
+		while wellFormed and indLetter < len(self.text): # Tant que le mot semble être horizontale et qu'on a pas fini de le parcourir
+			# ENORME condition pour savoir si les lettres se suivent horizontalement
+			wellFormed = (self.text[indLetter].x == startX and self.text[indLetter].y == startY+1) or (self.text[indLetter].x == startX and self.text[indLetter].y == startY-1)
+			startY = self.text[indLetter].y # On actualise la position en y avec celle de la lettre comparé au tour d'avant 
+			indLetter += 1 # On augmente pour comparer avec la lettre suivante
+
+		if wellFormed: # Si le mot est bien formé
+			return True # On retourne True
+		else: # Sinon
+			return False # On retourne False
+
+	def mot_vertical(self):
 		# Si toutes les lettres sont positionné verticalement
-		while not wellFormed and indLetter < len(self.text): 
-			if self.text[indLetter].y == startY: # Si le mot est bien formé verticalement
-				wellFormed = True
-				return True
-			else:
-				startY += 1
-				indLetter += 1
-		# On réinitialise les valeurs de comparaisons
-		startX = self.text[0].x+1 # Position x pour comparer les positions avec self.text[i].x
-		startY = self.text[0].y+1 # Position y pour comparer les positions avec self.text[i].y
-		indLetter = 1 # Indice de départ pour comparais les lettres
 
-		# Si toutes les lettres sont positionné en diagonale d'en haut à gauche à en bas à droite
-		while not wellFormed and indLetter < len(self.text):
-			if self.text[indLetter].x == startX and self.text[indLetter].y == startY: # Si le mot est bien formé horizontalement alors on renvoie True
-				wellFormed = True
-				return True
-			else:
-				startX += 1
-				startY += 1
-				indLetter += 1
-		# On réinitialise les valeurs de comparaisons
-		startX = self.text[0].x-1 # Position x pour comparer les positions avec self.text[i].x
-		startY = self.text[0].y+1 # Position y pour comparer les positions avec self.text[i].y
-		indLetter = 1 # Indice de départ pour comparais les lettres
+		startX = self.text[0].x # Position x pour comparer les positions avec self.text[indLetter].x
+		startY = self.text[0].y # Position y pour comparer les positions avec self.text[indLetter].y
+		indLetter = 1 # Indice pour comparer les position entre lettres. On commence avec la 2ème lettre car startX et startY sont les position de la première lettre
+		wellFormed = True # Booléen pour entrer dans la boucle 
 
-		# Si les lettres sont positionné toutes en diagonale d'en haut à droite à en bas à gauche
-		while not wellFormed and indLetter < len(self.text):
-			if self.text[indLetter].x == startX and self.text[indLetter].y == startY: # Si le mot est bien formé horizontalement alors on renvoie True
-				wellFormed = True
-				return True
-			else:
-				startX -= 1
-				startY += 1
-				indLetter += 1
-		
-		return wellFormed
-		"""
-		
+		while wellFormed and indLetter < len(self.text): # Tant que le mot semble être verical et qu'on a pas fini de le parcourir
+			# ENORME condition pour savoir si les lettres se suivent verticalement
+			wellFormed = (self.text[indLetter].x == startX+1 and self.text[indLetter].y == startY) or (self.text[indLetter].x == startX-1 and self.text[indLetter].y == startY)
+			startX = self.text[indLetter].x # On actualise la position en y avec celle de la lettre comparé au tour d'avant 
+			indLetter += 1 # On augmente pour comparer avec la lettre suivante
 
-	"""
-	La direction du mot est diagonale gauche droite si
-	on peut cliquer sur la lettre choisis et que ses coordonnées sont
-	self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y-1
-	ou self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y-1
-
-	La direction du mot est diagonale droite gauche si
-	on peut cliquer sur la lettre choisis et que ses coordonnées sont
-	self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y+1
-	ou self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y-1
-
-	La direction du mot est verticale si
-	on peut cliquer sur la lettre choisis et que ses coordonnées sont
-	self.mot[len(mot)-1].x et self.mot[len(mot)-1].y-1 
-	ou self.mot[len(mot)-1].x et self.mot[len(mot)-1].y+1
-
-	La direction du mot est horizontale si
-	on peut cliquer sur la lettre choisis et que ses coordonnées sont
-	self.mot[len(mot)-1].x+1 et self.mot[len(mot)-1].y
-	ou self.mot[len(mot)-1].x-1 et self.mot[len(mot)-1].y
-
-
-			# Si la lettre à droite est cliqué
-			if self.x+1 < len(self.gameMap[0]) and self.gameMap[self.x+1][self.y].isClicked:
-				self.mot.ajouter_Lettre(self)
-				self.index = len(self.mot.text)-1
-				self.boutton.configure(bg = "red",activebackground="red")
-				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué en haut de la lettre {self.gameMap[self.x+1][self.y].lettre}")
-
-			# Si la lettre en bas est cliqué par rapport à celle de droite
-			elif self.x-1 > 0 and self.gameMap[self.x-1][self.y].isClicked:
-				self.mot.ajouter_Lettre(self)
-				self.index = len(self.mot.text)-1
-				self.boutton.configure(bg = "red",activebackground="red")
-				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué en bas de la lettre {self.gameMap[self.x-1][self.y].lettre}")
-
-			# Si la lettre à gauche est cliqué par rapport à celle de droite 
-			elif self.y+1 < len(self.gameMap) and self.gameMap[self.x][self.y+1].isClicked:
-				self.mot.ajouter_Lettre(self)
-				self.index = len(self.mot.text)-1
-				self.boutton.configure(bg = "red",activebackground="red")
-				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué à gauche de la lettre {self.gameMap[self.x][self.y+1].lettre}")
-
-			# Si la lettre à droite est cliqué par rapport à celle de gauche
-			elif self.y-1 > 0 and self.gameMap[self.x][self.y-1].isClicked:
-				self.mot.ajouter_Lettre(self)
-				self.index = len(self.mot.text)-1
-				self.boutton.configure(bg = "red",activebackground="red")
-				self.isClicked = True
-				print(f"la lettre {self.lettre} est cliqué à droite de {self.gameMap[self.x][self.y-1].lettre}")
-
-			else:
-				self.mot.ajouter_Lettre(self)
-				self.boutton.configure(bg = "red",activebackground="red")
-				self.isClicked = True
-
-			# Si la lettre en haut à gauche est cliqué
-			# Si la lettre en haut à droite est cliqué
-			# Si la lettre en bas ç gauche est cliqué
-			# Si la lettre en bas à droite est cliqué
-	"""
+		if wellFormed: # Si le mot est bien formé
+			return True # On retourne True
+		else: # Sinon
+			return False # On retourne False
