@@ -2,7 +2,7 @@
 from ClassGame import *
 
 
-jeu = Jeu()
+Jeu = Jeu()
 """
 
 my_map = [line.split(',') for line  in open("carteMotMele.txt")]

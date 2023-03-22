@@ -5,6 +5,24 @@ import tkinter.font as font
 
 #### Fichier des class du jeu ####
 
+# Class menu pour la personnalisation du jeu et lancement du jeu
+class Menu(Tk):
+
+	def __init__(self):
+		super().__init__()
+		self.title("Menu") # Titre du jeu
+		self.geometry("1200x650+400+250") # Dimmension de la fenetre
+		self.minsize(width = 1200, height = 650) # Dimmension minimum de la fenetre
+		self.maxsize(width = 1200, height = 650) # Dimmension maximale de la fenetre
+		self.configure(bg="#45458B")
+
+		self.GameButton = Button(self,text = "jouer", command = lambda:[self.destroy,Jeu()])
+		self.GameButton.pack(padx = 100, pady = 100)
+
+		self.mainloop()
+
+
+
 # Class de la fenetre de jeu
 class Jeu(Tk):
 
