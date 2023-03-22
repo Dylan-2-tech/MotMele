@@ -1,4 +1,4 @@
-"""
+
 from ClassGame import *
 
 
@@ -14,3 +14,4 @@ for listLettre in my_map:
 
 
 print(my_map)
+"""
