@@ -42,6 +42,7 @@ class Jeu(Tk):
 					]
 
 		self.listeMot = ["POUR","IRIS","REVE"] # Liste de mot à trouvé dans la map
+		self.listeMotTrouve = [] # Liste des mot déjà trouvé
 
 		# Initialisation de la fenetre du jeu
 		self.title("Mot Mélé") # Titre du jeu
@@ -52,26 +53,31 @@ class Jeu(Tk):
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = Button(self, text = "Valider", bg = "green", fg = "white", command = lambda:valider(self))
-		self.valideBtn.place(x = 800, y = 150)
+		self.valideBtn.place(x = 850, y = 150)
 
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
-		self.leaveBtn.place(x = 900, y = 420) # emplacement forcé sur des pixel précis
+		self.leaveBtn.place(x = 1000, y = 550) # emplacement forcé sur des pixel précis
 
-		# Label qui affiche le mot valider
+		# Bouton pour deséléctionné toutes les lettres
+		self.ClearLettersBtn = Button(self,text = "Clear", command = lambda:clear(self))
+		self.ClearLettersBtn.place(x = 950, y = 150)
+
+		# Label qui affiche le mot séléctionné
 		self.MotLabel = Label(self,bg = "#45458B",font = font.Font(size=20),fg = "white")
-		self.MotLabel.place(x = 700, y = 300)
+		self.MotLabel.place(x = 900, y = 200)
+
+		# Label qui affiche si le mot séléctionné est bon ou pas
+		self.ValideLabel = Label(self,bg = "#45458B", font = font.Font(size=20))
+		self.ValideLabel.place(x = 750, y = 250)
 
 		# Mot qui va changer au fur et à mesure de la partie
 		self.mot = Mot()
 
-		# Le bouton qui va deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self,text = "Clear", command = lambda:clear(self))
-		self.ClearLettersBtn.place(x = 800, y = 420)
-
 		# Fonction qui nettoie les lettres sélectionner mais pas validé
 		def clear(self):
 			self.mot.clear_mot()
+			self.MotLabel.configure(text = self.mot.get_mot())
 			for listeLettre in self.gameMap:
 				for lettre in listeLettre:
 					if lettre.isClicked and not lettre.isValid:
@@ -84,18 +90,29 @@ class Jeu(Tk):
 			if self.mot.mot_correct(): # Si le mot est correct
 				indMot = 0
 				trouve = False
+				mot = self.mot.get_mot()
+
 				while not trouve and indMot < len(self.listeMot): # On recherche le mot pour savoir si le joueur à trouvé le bon
-					trouve = self.listeMot[indMot] == self.mot.get_mot() # True si le mot est dans la liste
+					trouve = self.listeMot[indMot] == mot # True si le mot est dans la liste
 					indMot += 1
 
 				if trouve: # Si on la trouvé
-					self.MotLabel.configure(text = "Vous avez trouvé le mot !")
+					self.listeMotTrouve.append(mot)
+					self.listeMot.pop(indMot-1)
 					self.mot.valider_mot()
-				else: # Si on la pas trouvé
-					self.MotLabel.configure(text = "Vous avez pas trouvé le bon mot :/")
+					if len(self.listeMot) == 0:
+						self.ValideLabel.configure(text = "Tu as gagné", fg = "green")
+						# arreter le timer
+					else:
+						self.ValideLabel.configure(text = "Vous avez trouvé le mot !", fg = "green")
+					
+				elif mot in self.listeMotTrouve: # Si le mot est déjà trouvé
+					self.ValideLabel.configure(text = "Mot déjà trouvé", fg = "red")
+				else: # Si le mot n'est pas le bon
+					self.ValideLabel.configure(text = "Pas le bon mot :/", fg = "red")
 
 			else: # Si le mot n'est pas correct
-				self.MotLabel.configure(text = "Le mot n'est pas valide")
+				self.ValideLabel.configure(text = "Le mot n'est pas valide", fg = "red")
 
 			self.mot.clear_mot()
 			clear(self)
