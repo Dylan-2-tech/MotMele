@@ -51,25 +51,39 @@ class Jeu(Tk):
 		self.maxsize(width = 1200, height = 650) # Dimmension maximale de la fenetre
 		self.configure(bg="#45458B")
 
-		# Boutton pour valider la sélection des lettres
-		self.valideBtn = Button(self, text = "Valider", bg = "green", fg = "white", command = lambda:valider(self))
-		self.valideBtn.place(x = 850, y = 150)
+		# Actuel taille en largeur de la fenetre du jeu self.winfo_width()
+		# Actuel taille en hauteur de la fenetre du jeu self.winfo_height()
 
-		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
-		self.leaveBtn.place(x = 1000, y = 550) # emplacement forcé sur des pixel précis
 
-		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self,text = "Clear", command = lambda:clear(self))
-		self.ClearLettersBtn.place(x = 950, y = 150)
+		# Frame qui va comporter tout les boutons pour valider etc
+		self.GameFrame = Frame(self, width = 500,height = 580, bg = "#45458B")
+		self.GameFrame.pack(side = RIGHT)
+		self.GameFrame.pack_propagate(0)
+
+
+		self.MotLabelFrame = LabelFrame(self.GameFrame,text = "Mot", width = 250, bg = "#45458B", font = font.Font(size = 15), labelanchor = 'n')
+		self.MotLabelFrame.pack(ipadx = 20, ipady = 5, pady = 20)
 
 		# Label qui affiche le mot séléctionné
-		self.MotLabel = Label(self,bg = "#45458B",font = font.Font(size=20),fg = "white")
-		self.MotLabel.place(x = 900, y = 200)
+		self.MotLabel = Label(self.MotLabelFrame,bg = "#45458B", font = font.Font(size=20),fg = "white")
+		self.MotLabel.pack()#place(x = 900, y = 200)
+
+		# Boutton pour valider la sélection des lettres
+		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "green", activebackground = "green", fg = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
+		self.valideBtn.place(x = 150, y = 250)
+
+		# Bouton pour deséléctionné toutes les lettres
+		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))
+		self.ClearLettersBtn.place(x = 300, y = 250)
+
+		# Boutton pour quitter la partie
+		self.leaveBtn = Button(self.GameFrame,text="Quitter",bg = "red", activebackground = "red", fg = "white",command=self.destroy, font = font.Font(size=15))
+		self.leaveBtn.place(x = 350, y = 525) # emplacement forcé sur des pixel précis
 
 		# Label qui affiche si le mot séléctionné est bon ou pas
-		self.ValideLabel = Label(self,bg = "#45458B", font = font.Font(size=20))
-		self.ValideLabel.place(x = 750, y = 250)
+		self.ValideLabel = Label(self.GameFrame,bg = "#45458B", font = font.Font(size=20))
+		self.ValideLabel.pack()#place(x = 750, y = 250)
+
 
 		# Mot qui va changer au fur et à mesure de la partie
 		self.mot = Mot()
@@ -137,6 +151,7 @@ class Lettre:
 
 	def __init__(self,lettre,x,y,game):
 
+		self.game = game
 		self.MotLabel = game.MotLabel
 		self.mot = game.mot
 		self.isValid = False # Si le mot est validé
