@@ -32,16 +32,17 @@ class Jeu(Tk):
 		# Map du jeu
 		self.gameMap = [ 
 					["P","O","U","R","I","Z","Y","I"],
-					["B","H","S","A","W","Q","U","A"],
-					["H","R","I","T","P","O","V","W"],
-					["L","J","R","R","I","M","R","F"],
+					["B","H","S","E","W","Q","U","A"],
+					["H","R","I","V","P","O","V","W"],
+					["L","J","R","E","I","M","R","F"],
 					["E","X","I","N","K","W","T","Y"],
 					["X","O","S","L","G","Y","H","O"],
 					["V","J","A","R","O","Y","F","P"],
 					["P","M","H","E","I","M","A","U"]
 					]
 
-		self.listeMot = ["POUR","IRIS"] # Liste de mot à trouvé dans la map
+		self.listeMot = ["POUR","IRIS","REVE"] # Liste de mot à trouvé dans la map
+		self.listeMotTrouve = [] # Liste des mot déjà trouvé
 
 		# Initialisation de la fenetre du jeu
 		self.title("Mot Mélé") # Titre du jeu
@@ -52,7 +53,36 @@ class Jeu(Tk):
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = Button(self, text = "Valider", bg = "green", fg = "white", command = lambda:valider(self))
-		self.valideBtn.place(x = 800, y = 150)
+		self.valideBtn.place(x = 850, y = 150)
+
+		# Boutton pour quitter la partie
+		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
+		self.leaveBtn.place(x = 1000, y = 550) # emplacement forcé sur des pixel précis
+
+		# Bouton pour deséléctionné toutes les lettres
+		self.ClearLettersBtn = Button(self,text = "Clear", command = lambda:clear(self))
+		self.ClearLettersBtn.place(x = 950, y = 150)
+
+		# Label qui affiche le mot séléctionné
+		self.MotLabel = Label(self,bg = "#45458B",font = font.Font(size=20),fg = "white")
+		self.MotLabel.place(x = 900, y = 200)
+
+		# Label qui affiche si le mot séléctionné est bon ou pas
+		self.ValideLabel = Label(self,bg = "#45458B", font = font.Font(size=20))
+		self.ValideLabel.place(x = 750, y = 250)
+
+		# Mot qui va changer au fur et à mesure de la partie
+		self.mot = Mot()
+
+		# Fonction qui nettoie les lettres sélectionner mais pas validé
+		def clear(self):
+			self.mot.clear_mot()
+			self.MotLabel.configure(text = self.mot.get_mot())
+			for listeLettre in self.gameMap:
+				for lettre in listeLettre:
+					if lettre.isClicked and not lettre.isValid:
+						lettre.isClicked = False
+						lettre.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
 
 		# Méthode Valider
 		def valider(self):
@@ -60,46 +90,32 @@ class Jeu(Tk):
 			if self.mot.mot_correct(): # Si le mot est correct
 				indMot = 0
 				trouve = False
+				mot = self.mot.get_mot()
+
 				while not trouve and indMot < len(self.listeMot): # On recherche le mot pour savoir si le joueur à trouvé le bon
-					trouve = self.listeMot[indMot] == self.mot.get_mot() # True si le mot est dans la liste
+					trouve = self.listeMot[indMot] == mot # True si le mot est dans la liste
 					indMot += 1
 
 				if trouve: # Si on la trouvé
-					self.MotLabel.configure(text = "Vous avez trouvé le mot !")
+					self.listeMotTrouve.append(mot)
+					self.listeMot.pop(indMot-1)
 					self.mot.valider_mot()
-				else: # Si on la pas trouvé
-					self.MotLabel.configure(text = "Vous avez pas trouvé le bon mot :/")
-					clear(self)
+					if len(self.listeMot) == 0:
+						self.ValideLabel.configure(text = "Tu as gagné", fg = "green")
+						# arreter le timer
+					else:
+						self.ValideLabel.configure(text = "Vous avez trouvé le mot !", fg = "green")
+					
+				elif mot in self.listeMotTrouve: # Si le mot est déjà trouvé
+					self.ValideLabel.configure(text = "Mot déjà trouvé", fg = "red")
+				else: # Si le mot n'est pas le bon
+					self.ValideLabel.configure(text = "Pas le bon mot :/", fg = "red")
 
 			else: # Si le mot n'est pas correct
-				self.MotLabel.configure(text = "Le mot n'est pas valide")
-				clear(self)
+				self.ValideLabel.configure(text = "Le mot n'est pas valide", fg = "red")
 
 			self.mot.clear_mot()
-
-		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self,text="Quitter",bg = "red",fg = "white",command=self.destroy, font = font.Font(size=15))
-		self.leaveBtn.place(x = 900, y = 420) # emplacement forcé sur des pixel précis
-
-		# Label qui affiche le mot valider
-		self.MotLabel = Label(self,bg = "#45458B",font = font.Font(size=20),fg = "white")
-		self.MotLabel.place(x = 700, y = 300)
-
-		# Mot qui va changer au fur et à mesure de la partie
-		self.mot = Mot()
-
-		# Le bouton qui va deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self,text = "Clear", command = lambda:clear(self))
-		self.ClearLettersBtn.place(x = 800, y = 420)
-
-		# Fonction qui nettoie les lettres sélectionner mais pas validé
-		def clear(self):
-			self.mot.clear_mot()
-			for listeLettre in self.gameMap:
-				for lettre in listeLettre:
-					if lettre.isClicked and not lettre.isValid:
-						lettre.isClicked = False
-						lettre.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
+			clear(self)
 
 
 		# génération de la map des lettres
@@ -135,7 +151,7 @@ class Lettre:
 	
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 
-		if self.isClicked and not self.isValid: # Si la lettre est déja cliqué et pas validé
+		if self.isClicked and not self.isValid: # Si la lettre est déja cliqué
 			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE") # On remet une couleur par défaut 
 			self.isClicked = False # Elle devient plus cliqué
 			self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
@@ -146,6 +162,12 @@ class Lettre:
 			self.isClicked = True # Elle devient cliqué
 			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
 			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
+		elif self.isClicked and self.isValid: # Si la lettre est déjà cliqué et déjà validé
+			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
+			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
+
 
 
 
@@ -167,6 +189,7 @@ class Mot:
 	def valider_mot(self):
 		for lettre in self.text:
 			lettre.isValid = True
+			lettre.boutton.configure(bg = "green", activebackground = "#359221")
 
 	def ajouter_Lettre(self, lettre):
 		self.text.append(lettre)
