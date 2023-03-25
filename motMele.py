@@ -2,7 +2,7 @@
 from ClassGame import *
 
 
-Jeu = Jeu()
+Jeu = Menu()
 
 """
 
@@ -15,4 +15,4 @@ for listLettre in my_map:
 
 
 print(my_map)
-"""
+"""#45458B

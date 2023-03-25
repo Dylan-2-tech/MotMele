@@ -11,13 +11,21 @@ class Menu(Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("Menu") # Titre du jeu
-		self.geometry("1200x650+400+250") # Dimmension de la fenetre
-		self.minsize(width = 1200, height = 650) # Dimmension minimum de la fenetre
-		self.maxsize(width = 1200, height = 650) # Dimmension maximale de la fenetre
+		self.geometry("500x200+400+250") # Dimmension de la fenetre
+		self.minsize(width = 500, height = 200) # Dimmension minimum de la fenetre
+		self.maxsize(width = 500, height = 200) # Dimmension maximale de la fenetre
 		self.configure(bg="#45458B")
 
-		self.GameButton = Button(self,text = "jouer", command = lambda:[self.destroy,Jeu()])
-		self.GameButton.pack(padx = 100, pady = 100)
+		self.GameButton = Button(self,text = "jouer", command = lambda:launch_game(self))
+		self.GameButton.pack()
+
+		# Boutton pour quitter la partie
+		self.leaveBtn = Button(self,text="Quitter",bg = "red", activebackground = "red", fg = "white",command = self.destroy, font = font.Font(size=15))
+		self.leaveBtn.pack()
+
+		def launch_game(self):
+			self.destroy()
+			Jeu()
 
 		self.mainloop()
 
@@ -36,7 +44,7 @@ class Jeu(Tk):
 					["H","R","I","V","P","O","V","W"],
 					["L","J","R","E","I","M","R","F"],
 					["E","X","I","N","K","W","T","Y"],
-					["X","O","S","L","G","Y","H","O"],
+					["X","O","T","L","G","Y","H","O"],
 					["V","J","A","R","O","Y","F","P"],
 					["P","M","H","E","I","M","A","U"]
 					]
@@ -56,12 +64,12 @@ class Jeu(Tk):
 
 
 		# Frame qui va comporter tout les boutons pour valider etc
-		self.GameFrame = Frame(self, width = 500,height = 580, bg = "#45458B")
+		self.GameFrame = Frame(self, width = 500,height = 600, bg = "#45458B")
 		self.GameFrame.pack(side = RIGHT)
 		self.GameFrame.pack_propagate(0)
 
-
-		self.MotLabelFrame = LabelFrame(self.GameFrame,text = "Mot", width = 250, bg = "#45458B", font = font.Font(size = 15), labelanchor = 'n')
+		# Label Frame qui va prendre en son centre l'affichage du mot
+		self.MotLabelFrame = LabelFrame(self.GameFrame,text = "Mot", width = 250, bg = "#45458B", font = font.Font(size = 17), labelanchor = 'n')
 		self.MotLabelFrame.pack(ipadx = 20, ipady = 5, pady = 20)
 
 		# Label qui affiche le mot séléctionné
@@ -70,19 +78,30 @@ class Jeu(Tk):
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "green", activebackground = "green", fg = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
-		self.valideBtn.place(x = 150, y = 250)
+		self.valideBtn.place(x = 150, y = 170)
 
 		# Bouton pour deséléctionné toutes les lettres
 		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))
-		self.ClearLettersBtn.place(x = 300, y = 250)
+		self.ClearLettersBtn.place(x = 300, y = 170)
+
+		# Label Frame qui va prendre en son intérieur les mots à trouver
+		self.MotATrouveLabelFrame = LabelFrame(self.GameFrame, text = "Mots à trouvé", font = font.Font(size = 17), bg = "#45458B")
+		self.MotATrouveLabelFrame.place(x = 150, y = 250)#pack(ipadx = 20, ipady = 10, pady = 150)
+
+		# ListBox qui va afficher les mots à trouvé
+		self.var = StringVar(value = self.listeMot)
+		self.ListeBoxMotATrouver = Listbox(self.MotATrouveLabelFrame, font = font.Font(size = 14), width = 16 ,
+			activestyle = 'none', selectbackground = "#45458B", bg = "#45458B",
+			borderwidth=0, highlightthickness=0, listvariable = self.var)
+		self.ListeBoxMotATrouver.pack(pady = 10, padx = 10)
 
 		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self.GameFrame,text="Quitter",bg = "red", activebackground = "red", fg = "white",command=self.destroy, font = font.Font(size=15))
-		self.leaveBtn.place(x = 350, y = 525) # emplacement forcé sur des pixel précis
+		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",command= lambda:back_menu(self), font = font.Font(size=15))
+		self.leaveBtn.place(x = 325, y = 550) # emplacement forcé sur des pixel précis
 
 		# Label qui affiche si le mot séléctionné est bon ou pas
 		self.ValideLabel = Label(self.GameFrame,bg = "#45458B", font = font.Font(size=20))
-		self.ValideLabel.pack()#place(x = 750, y = 250)
+		self.ValideLabel.pack(side = TOP)#place(x = 750, y = 250)
 
 
 		# Mot qui va changer au fur et à mesure de la partie
@@ -113,6 +132,7 @@ class Jeu(Tk):
 				if trouve: # Si on la trouvé
 					self.listeMotTrouve.append(mot)
 					self.listeMot.pop(indMot-1)
+					self.var.set(self.listeMot)
 					self.mot.valider_mot()
 					if len(self.listeMot) == 0:
 						self.ValideLabel.configure(text = "Tu as gagné", fg = "green")
@@ -130,6 +150,11 @@ class Jeu(Tk):
 
 			self.mot.clear_mot()
 			clear(self)
+		
+		def back_menu(self):
+			self.destroy()
+			Menu()
+
 
 
 		# génération de la map des lettres
@@ -181,8 +206,6 @@ class Lettre:
 		elif self.isClicked and self.isValid: # Si la lettre est déjà cliqué et déjà validé
 			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
 			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
-
-
 
 
 
