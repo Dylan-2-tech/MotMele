@@ -62,9 +62,22 @@ class Menu(Tk):
 
 		# Méthode qui va servir de lancer la partie et de fermer la fnetre du menu
 		def launch_game(self):
-			grille = self.GrilleListBox.get(self.GrilleListBox.curselection())
-			self.destroy()
-			Jeu(grille)
+			# Etape de préparation pour voir si la grille séléctionné à des mots ou non
+			try:
+				grille = self.GrilleListBox.get(self.GrilleListBox.curselection())
+
+				if glob.glob(f"mot/{grille}.txt") == []: # Si la grille n'a pas de mot
+					# Affichage du label de l'erreur
+					self.ERRORLABEL = Label(self, text = "La grille n'a pas de mots attitrés", bg = "#45458B", fg = "red", font = font.Font(size = 15))
+					self.ERRORLABEL.pack()
+					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				else:
+					self.destroy()
+					Jeu(grille)
+			except:
+				self.ERRORLABEL = Label(self, text = "Veuillez choisir une grille", bg = "#45458B", fg = "red", font = font.Font(size = 15))
+				self.ERRORLABEL.pack()
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		self.mainloop()
 
@@ -126,7 +139,7 @@ class Jeu(Tk):
 		self.ListeBoxMotATrouver = Listbox(self.MotATrouveLabelFrame, font = font.Font(size = 14), width = 16 ,
 			activestyle = 'none', selectbackground = "#45458B", bg = "#45458B",
 			borderwidth=0, highlightthickness=0, listvariable = self.var)
-		self.ListeBoxMotATrouver.pack(pady = 10, padx = 10)
+		self.ListeBoxMotATrouver.pack()
 
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",command= lambda:back_menu(self), font = font.Font(size=15))
