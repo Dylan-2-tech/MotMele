@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter.font as font
+import glob
 
 
 #### Fichier des class du jeu ####
@@ -11,45 +12,78 @@ class Menu(Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("Menu") # Titre du jeu
-		self.geometry("500x200+400+250") # Dimmension de la fenetre
-		self.minsize(width = 500, height = 200) # Dimmension minimum de la fenetre
-		self.maxsize(width = 500, height = 200) # Dimmension maximale de la fenetre
-		self.configure(bg="#45458B")
+		self.geometry("1000x500+400+250") # Dimmension de la fenetre
+		self.minsize(width = 1000, height = 500) # Dimmension minimum de la fenetre
+		self.maxsize(width = 1000, height = 500) # Dimmension maximale de la fenetre
+		self.configure(bg="#45458B") # Couleur de fond
 
-		self.GameButton = Button(self,text = "jouer", command = lambda:launch_game(self))
-		self.GameButton.pack()
+		liste_de_grille = glob.glob("grille/*.txt")
+
+		for i in range(len(liste_de_grille)):
+			liste_de_grille[i] = liste_de_grille[i].replace('grille\\','')
+			liste_de_grille[i] = liste_de_grille[i].replace('.txt','')
+
+		# Frame qui va occuper tout le haut du menu et qui va comporter la phrase de Menu
+		self.MenuFrame = Frame(self, bg = "red", height = 100)
+		self.MenuFrame.pack(fill = X, side = TOP)
+		self.MenuFrame.pack_propagate(0)
+
+		# Label du menu
+		self.MenuLabel = Label(self.MenuFrame, bg = "#45458B" , fg = "black", text = "Menu du jeu", font = font.Font(size = 30))
+		self.MenuLabel.pack(fill = BOTH, expand = True)
+
+		# Label Frame de la personnalisation des couleurs du jeu
+		self.PersonnalisationLabelFrame = LabelFrame(self, text = "Personnalisation", bg = "#45458B", width= 300, font = font.Font(size = 20), labelanchor = 'n')
+		self.PersonnalisationLabelFrame.pack(side = LEFT, ipady = 10, ipadx = 20, pady = 20, padx = 20, fill = Y)
+
+		# Label Frame de la création de grille de jeu
+		self.CreationLabelFrame = LabelFrame(self, text = "Création de Grilles", bg = "#45458B", width= 300, font = font.Font(size = 20), labelanchor = 'n')
+		self.CreationLabelFrame.pack(side = RIGHT, ipady = 10, ipadx = 20, pady = 20, padx = 20, fill = Y)
+
+		# Label Frame pour charger une grille de jeu
+		self.ChargerGrilleLabelFrame = LabelFrame(self.CreationLabelFrame, text = "Charger", bg = "#45458B", font = font.Font(size = 15))
+		self.ChargerGrilleLabelFrame.pack(side = BOTTOM, ipady = 5, ipadx = 5, pady = 10, padx= 10, fill = BOTH)
+
+		self.var = StringVar(value = liste_de_grille) # Liste des grilles 
+		# List box qui va comporter les grilles que le joueur peut Charger
+		self.GrilleListBox = Listbox(self.ChargerGrilleLabelFrame, bg = "#6D5EBD",
+			activestyle = 'none', selectbackground = "#6D5EBD", font = font.Font(size = 15),
+			borderwidth=0, highlightthickness=0, listvariable = self.var)
+		self.GrilleListBox.pack(fill = BOTH, expand = True)
+
+		# Boutton qui permet de fermer la fenetre du menu et de lancer le jeu
+		self.GameButton = Button(self,text = "JOUER", font = font.Font(size = 15),bg = "#6E64A2", command = lambda:launch_game(self))
+		self.GameButton.pack(pady = 50)
 
 		# Boutton pour quitter la partie
 		self.leaveBtn = Button(self,text="Quitter",bg = "red", activebackground = "red", fg = "white",command = self.destroy, font = font.Font(size=15))
-		self.leaveBtn.pack()
+		self.leaveBtn.pack(side = BOTTOM, pady = 30)
 
+
+		# Méthode qui va servir de lancer la partie et de fermer la fnetre du menu
 		def launch_game(self):
+			grille = self.GrilleListBox.get(self.GrilleListBox.curselection())
 			self.destroy()
-			Jeu()
+			Jeu(grille)
 
 		self.mainloop()
-
 
 
 # Class de la fenetre de jeu
 class Jeu(Tk):
 
-	def __init__(self):
+	def __init__(self,grille):
 		super().__init__()
 
 		# Map du jeu
-		self.gameMap = [ 
-					["P","O","U","R","I","Z","Y","I"],
-					["B","H","S","E","W","Q","U","A"],
-					["H","R","I","V","P","O","V","W"],
-					["L","J","R","E","I","M","R","F"],
-					["E","X","I","N","K","W","T","Y"],
-					["X","O","T","L","G","Y","H","O"],
-					["V","J","A","R","O","Y","F","P"],
-					["P","M","H","E","I","M","A","U"]
-					]
 
-		self.listeMot = ["POUR","IRIS","REVE"] # Liste de mot à trouvé dans la map
+		self.grille = [line.split(',') for line  in open(f"grille/{grille}.txt")]
+
+		for listLettre in self.grille:
+			for i in range(len(listLettre)):
+				listLettre[i] = listLettre[i].replace('\n','')
+
+		self.listeMot = [mot.split(',') for mot in open(f"mot/{grille}.txt")][0]# # Liste de mot à trouvé dans la map
 		self.listeMotTrouve = [] # Liste des mot déjà trouvé
 
 		# Initialisation de la fenetre du jeu
@@ -61,7 +95,6 @@ class Jeu(Tk):
 
 		# Actuel taille en largeur de la fenetre du jeu self.winfo_width()
 		# Actuel taille en hauteur de la fenetre du jeu self.winfo_height()
-
 
 		# Frame qui va comporter tout les boutons pour valider etc
 		self.GameFrame = Frame(self, width = 500,height = 600, bg = "#45458B")
@@ -103,7 +136,6 @@ class Jeu(Tk):
 		self.ValideLabel = Label(self.GameFrame,bg = "#45458B", font = font.Font(size=20))
 		self.ValideLabel.pack(side = TOP)#place(x = 750, y = 250)
 
-
 		# Mot qui va changer au fur et à mesure de la partie
 		self.mot = Mot()
 
@@ -111,7 +143,7 @@ class Jeu(Tk):
 		def clear(self):
 			self.mot.clear_mot()
 			self.MotLabel.configure(text = self.mot.get_mot())
-			for listeLettre in self.gameMap:
+			for listeLettre in self.grille:
 				for lettre in listeLettre:
 					if lettre.isClicked and not lettre.isValid:
 						lettre.isClicked = False
@@ -159,12 +191,12 @@ class Jeu(Tk):
 
 		# génération de la map des lettres
 		posy = 40 # position y du boutton de la lettre
-		for x in range(len(self.gameMap)): # on parcours la map en x
+		for x in range(len(self.grille)): # on parcours la map en x
 			posx = 40 # La position initiale de chaque boutton en x est donc 0 pour la premiere ligne
-			for y in range(len(self.gameMap[0])): # On parcours la map en y
-				lettre = Lettre(self.gameMap[x][y],x,y,self) # on initialise les lettre grâce à la classe Lettre
-				lettre.boutton.place(x=posx, y=posy) # on place le boutton de la lettre qui correspond à la position gameMap[x][y]
-				self.gameMap[x][y] = lettre
+			for y in range(len(self.grille[0])): # On parcours la map en y
+				lettre = Lettre(self.grille[x][y],x,y,self) # on initialise les lettre grâce à la classe Lettre
+				lettre.boutton.place(x=posx, y=posy) # on place le boutton de la lettre qui correspond à la position grille[x][y]
+				self.grille[x][y] = lettre
 				posx+=75 # On incrémente de 100 la position en x pour laisser quelques pixels pour d'écart en horizontal
 			posy += 75 # On incrémente de 115 la position en y pour laisser un espace de quelques pixels d'écart en vertical
 
@@ -176,7 +208,6 @@ class Lettre:
 
 	def __init__(self,lettre,x,y,game):
 
-		self.game = game
 		self.MotLabel = game.MotLabel
 		self.mot = game.mot
 		self.isValid = False # Si le mot est validé
