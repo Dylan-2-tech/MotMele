@@ -22,7 +22,7 @@ class Menu(Tk):
 		liste_de_grille = glob.glob("grille/*.txt")
 
 		for i in range(len(liste_de_grille)):
-			liste_de_grille[i] = liste_de_grille[i].replace('grille\\','')
+			liste_de_grille[i] = liste_de_grille[i].replace('grille/','')
 			liste_de_grille[i] = liste_de_grille[i].replace('.txt','')
 
 		# Frame qui va occuper tout le haut du menu et qui va comporter la phrase de Menu
@@ -58,11 +58,11 @@ class Menu(Tk):
 		self.GrilleListBox.pack(fill = BOTH, expand = True)
 
 		# Boutton qui permet de fermer la fenetre du menu et de lancer le jeu
-		self.GameButton = Button(self,text = "JOUER", font = font.Font(size = 15),bg = "#6E64A2", command = lambda:launch_game(self))
+		self.GameButton = Button(self,text = "JOUER",fg = "white", font = font.Font(size = 15),bg = "#6E64A2", activebackground = "#8177B4",activeforeground = "white", command = lambda:launch_game(self))
 		self.GameButton.pack(pady = 50)
 
 		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self,text="Quitter",bg = "red", activebackground = "red", fg = "white",command = self.destroy, font = font.Font(size=15))
+		self.leaveBtn = Button(self,text="Quitter",bg = "#C22955", activebackground = "#D7436D",activeforeground = "white", fg = "white",command = self.destroy, font = font.Font(size=15))
 		self.leaveBtn.pack(side = BOTTOM, pady = 30)
 
 
@@ -221,11 +221,15 @@ class Jeu(Tk):
 		self.MotLabel.pack()#place(x = 900, y = 200)
 
 		# Boutton pour valider la sélection des lettres
-		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "green", activebackground = "green", fg = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
+		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "#2C8031", activebackground = "#3E9D44", fg = "white",activeforeground = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
 		self.valideBtn.place(x = 150, y = 170)
 
 		# Bouton pour deséléctionné toutes les lettres
+<<<<<<< HEAD
 		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))#
+=======
+		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "#337292", activebackground = "#4991B6",fg = "white",activeforeground = "white", font = font.Font(size = 14) , command = lambda:clear(self))
+>>>>>>> 3ab6eb1b5494764ac49e8f05fc2d7f095c4bcc7a
 		self.ClearLettersBtn.place(x = 300, y = 170)
 
 		# Label Frame qui va prendre en son intérieur les mots à trouver
@@ -240,7 +244,7 @@ class Jeu(Tk):
 		self.ListeBoxMotATrouver.pack()
 
 		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",command= lambda:back_menu(self), font = font.Font(size=15))
+		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",activeforeground = "white",command= lambda:back_menu(self), font = font.Font(size=15))
 		self.leaveBtn.place(x = 325, y = 550) # emplacement forcé sur des pixel précis
 
 		# Label qui affiche si le mot séléctionné est bon ou pas
