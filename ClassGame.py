@@ -134,10 +134,6 @@ class Creation(Tk):
 		self.fileName = Entry(self, font = font.Font(size = 12))
 		self.fileName.pack(side = RIGHT)
 
-		# Label qui affiche les erreurs
-		self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 20))
-		self.ERRORLABEL.pack(side = RIGHT)
-
 
 		def afficher(self):
 			for liste in self.nouvelleGrille:
@@ -162,9 +158,15 @@ class Creation(Tk):
 		def transformer(self):
 			if len(self.fileName.get()) > 3:
 				if plus_une_lettre(self):
-					self.ERRORLABEL.configure(text = "entre qu'une ptn de lettre ptnnnnnnnn de merdeuuuuh tu comprends pas ??")
+					self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 20),
+						text = "Insérez qu'une seule lettre dans chaque case")
+					self.ERRORLABEL.pack(side = RIGHT)					
+					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 				else:
-					self.ERRORLABEL.configure(text = f"La grille {self.fileName.get()} est créer", fg = "green")
+					self.ERRORLABEL = Label(self, bg = "#45458B", fg = "green", font = font.Font(size = 20),
+						text = f"La grille {self.fileName.get()} est créé")
+					self.ERRORLABEL.pack(side = RIGHT)					
+					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 					for x in range(len(self.entryGrille)):
 						for y in range(len(self.entryGrille[0])):
 							if self.entryGrille[x][y].get() != "":
@@ -172,7 +174,10 @@ class Creation(Tk):
 							else:
 								self.nouvelleGrille[x][y] = self.letters[random.randint(0,25)]
 			else:
-				self.ERRORLABEL.configure(text = "ET LE PTN DE NOM DU FICHIER DOIT ETRE SUPERIEUR A 3 PTN DE MERDE", fg = "red")
+				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 20),
+					text = "Minimum 4 lettres dans le nom de la grille")
+				self.ERRORLABEL.pack(side = RIGHT)					
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		self.mainloop()
 
@@ -225,11 +230,8 @@ class Jeu(Tk):
 		self.valideBtn.place(x = 150, y = 170)
 
 		# Bouton pour deséléctionné toutes les lettres
-<<<<<<< HEAD
 		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))#
-=======
 		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "#337292", activebackground = "#4991B6",fg = "white",activeforeground = "white", font = font.Font(size = 14) , command = lambda:clear(self))
->>>>>>> 3ab6eb1b5494764ac49e8f05fc2d7f095c4bcc7a
 		self.ClearLettersBtn.place(x = 300, y = 170)
 
 		# Label Frame qui va prendre en son intérieur les mots à trouver
