@@ -1,12 +1,14 @@
 {
 	"mainBG":"#45458B",
-	"letterButton":"#A3A3FE",
-	"playButton":"#6E64A2",
-	"hoverPlayButton":"#8177B4",
-	"leaveButton":"#C22955",
-	"hoverLeaveButton":"#D7436D",
-	"valideButton":"#2C8031",
-	"hoverValideButton":"#3E9D44",
-	"clearButton":"#337292",
-	"hoverClearButton":"#4991B6"
+	"letterBtn":"#A3A3FE",
+	"playBtn":"#6E64A2",
+	"hoverPlayBtn":"#8177B4",
+	"leaveBtn":"#C22955",
+	"hoverLeaveBtn":"#D7436D",
+	"valideBtn":"#2C8031",
+	"hoverValideBtn":"#3E9D44",
+	"clearBtn":"#337292",
+	"hoverClearBtn":"#4991B6",
+	"createBtn":"#3B706E",
+	"hoverCreateBtn":"#448784"
 }
