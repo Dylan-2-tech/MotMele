@@ -1,4 +1,4 @@
 from ClassGame import *
 
-
-Jeu = Creation()
+Jeu = Menu()
+Jeu.mainloop()
