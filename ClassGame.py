@@ -43,7 +43,8 @@ class Menu(Tk):
 		self.CreationLabelFrame.pack(side = RIGHT, ipady = 10, ipadx = 20, pady = 20, padx = 20, fill = Y)
 
 		# Boutton pour creer des grilles
-		self.CreationBoutton = Button(self.CreationLabelFrame,text = "Creer",font = font.Font(size = 15), bg = "blue", fg = "white", activebackground = "light blue", activeforeground = "white")
+		self.CreationBoutton = Button(self.CreationLabelFrame,text = "Creer",font = font.Font(size = 15), bg = "blue", fg = "white",
+		 activebackground = "light blue", activeforeground = "white")
 		self.CreationBoutton.pack(pady = 5)
 
 		# Label Frame pour charger une grille de jeu
@@ -58,11 +59,13 @@ class Menu(Tk):
 		self.GrilleListBox.pack(fill = BOTH, expand = True)
 
 		# Boutton qui permet de fermer la fenetre du menu et de lancer le jeu
-		self.GameButton = Button(self,text = "JOUER",fg = "white", font = font.Font(size = 15),bg = "#6E64A2", activebackground = "#8177B4",activeforeground = "white", command = lambda:launch_game(self))
+		self.GameButton = Button(self,text = "JOUER",fg = "white", font = font.Font(size = 15),bg = "#6E64A2", 
+		 activebackground = "#8177B4",activeforeground = "white", command = lambda:launch_game(self))
 		self.GameButton.pack(pady = 50)
 
 		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self,text="Quitter",bg = "#C22955", activebackground = "#D7436D",activeforeground = "white", fg = "white",command = self.destroy, font = font.Font(size=15))
+		self.leaveBtn = Button(self,text="Quitter",bg = "#C22955", activebackground = "#D7436D",activeforeground = "white",
+		 fg = "white",command = self.destroy, font = font.Font(size=15))
 		self.leaveBtn.pack(side = BOTTOM, pady = 30)
 
 
@@ -92,49 +95,54 @@ class Creation(Tk):
 	def __init__(self):
 		super().__init__()
 
-		self.title("Menu") # Titre du jeu
+		self.title("Création de grilles") # Titre du jeu
 		self.geometry("1000x500+400+250") # Dimmension de la fenetre
-		self.minsize(width = 1000, height = 500) # Dimmension minimum de la fenetre
-		self.maxsize(width = 1000, height = 500) # Dimmension maximale de la fenetre
+		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
+		self.maxsize(width = 1200, height = 500) # Dimmension maximale de la fenetre
 		self.configure(bg="#45458B") # Couleur de fond
 
-		# Génération de la grille d'entrées remplir pour créer la grille
-		self.letters = string.ascii_uppercase # Toutes les lettres de l'alphabet en majuscules
+		# Toutes les lettres de l'alphabet en majuscules
+		self.letters = string.ascii_uppercase
 
-		# Liste des entré qui vont prendre les lettre du joueur pour créer la grille
-		self.entryGrille = [[Entry(self,font = font.Font(size = 25), width = 2) for i in range(9)] for i in range(9)]
+		# Label Frame qui va contenir la grille et les options de création
+		self.GrilleLabelFrame = LabelFrame(self, text = "Grille", labelanchor = 'n', width = 700, font = font.Font(size = 20))
+		self.GrilleLabelFrame.pack(side = LEFT, fill = BOTH,pady = 20, padx = 20)
+
+		# Double liste des entré qui vont prendre les lettre du joueur pour créer la grille
+		self.entryGrille = [[Entry(self.GrilleLabelFrame,font = font.Font(size = 25), width = 2,bg = "#555591") for i in range(9)] for i in range(9)]
 		# Double liste de charactère vide qui représente la grille que le joueur va créer
 		self.nouvelleGrille = [["" for i in range(9)] for i in range(9)]
 
+		# Entry qui va prendre le nom de la grille que le joueur veut créer
+		self.fileName = Entry(self.GrilleLabelFrame, font = font.Font(size = 15),bg = "#555591")
+		self.fileName.pack(padx = 40, side = TOP)
 
 		# Affichage de la grille d'entrée
-		posy = 30
+		posy = 50
 		for listeEntry in self.entryGrille:
-			posx = 30
+			posx = 10
 			for entry in listeEntry:
 				entry.place(x = posx, y = posy)
 				posx += 45
 			posy += 45
 
 		# Boutton pour creer des grilles
-		self.CreationBoutton = Button(self,text = "Creer",font = font.Font(size = 15), bg = "blue",
+		self.CreationBoutton = Button(self.GrilleLabelFrame,text = "Générer",font = font.Font(size = 15), bg = "blue",
 		 fg = "white", activebackground = "light blue", activeforeground = "white",command = lambda:transformer(self))
-		self.CreationBoutton.pack(pady = 5)
+		self.CreationBoutton.pack(pady = 5, side = BOTTOM)
 
 		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))#
-		self.ClearLettersBtn.pack()
-
-		# btn display
-		self.displaybtn = Button(self,text = "afficher",font = font.Font(size = 15), bg = "blue",
-		 fg = "white", activebackground = "light blue", activeforeground = "white",command = lambda:afficher(self))
-		self.displaybtn.pack(pady = 5)
-
-		# Entry qui va prendre le nom de la grille que le joueur veut créer
-		self.fileName = Entry(self, font = font.Font(size = 12))
-		self.fileName.pack(side = RIGHT)
+		self.ClearLettersBtn = Button(self.GrilleLabelFrame,text = "Clear",bg = "light blue", activebackground = "light blue",
+		 font = font.Font(size = 14) , command = lambda:clear(self))
+		self.ClearLettersBtn.pack(side = BOTTOM)
 
 
+		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
+		self.AffichageLabelFrame = LabelFrame(self, text = "Affichage", font = font.Font(size = 20), width = 00, labelanchor = 'n', bg = "#45458B")
+		self.AffichageLabelFrame.pack(side = RIGHT, fill = BOTH)
+		self.AffichageLabelFrame.pack_propagate(0)
+
+		
 		def afficher(self):
 			for liste in self.nouvelleGrille:
 				print(liste)
@@ -160,12 +168,12 @@ class Creation(Tk):
 				if plus_une_lettre(self):
 					self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 20),
 						text = "Insérez qu'une seule lettre dans chaque case")
-					self.ERRORLABEL.pack(side = RIGHT)					
+					self.ERRORLABEL.pack()					
 					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 				else:
 					self.ERRORLABEL = Label(self, bg = "#45458B", fg = "green", font = font.Font(size = 20),
 						text = f"La grille {self.fileName.get()} est créé")
-					self.ERRORLABEL.pack(side = RIGHT)					
+					self.ERRORLABEL.pack()					
 					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 					for x in range(len(self.entryGrille)):
 						for y in range(len(self.entryGrille[0])):
@@ -176,7 +184,7 @@ class Creation(Tk):
 			else:
 				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 20),
 					text = "Minimum 4 lettres dans le nom de la grille")
-				self.ERRORLABEL.pack(side = RIGHT)					
+				self.ERRORLABEL.pack()					
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		self.mainloop()
@@ -226,12 +234,13 @@ class Jeu(Tk):
 		self.MotLabel.pack()#place(x = 900, y = 200)
 
 		# Boutton pour valider la sélection des lettres
-		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "#2C8031", activebackground = "#3E9D44", fg = "white",activeforeground = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
+		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "#2C8031", activebackground = "#3E9D44", fg = "white", 
+			activeforeground = "white", height = 1, font = font.Font(size = 14), command = lambda:valider(self))
 		self.valideBtn.place(x = 150, y = 170)
 
 		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "light blue", activebackground = "light blue", font = font.Font(size = 14) , command = lambda:clear(self))#
-		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "#337292", activebackground = "#4991B6",fg = "white",activeforeground = "white", font = font.Font(size = 14) , command = lambda:clear(self))
+		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "#337292", activebackground = "#4991B6",fg = "white",
+			activeforeground = "white", font = font.Font(size = 14) , command = lambda:clear(self))
 		self.ClearLettersBtn.place(x = 300, y = 170)
 
 		# Label Frame qui va prendre en son intérieur les mots à trouver
@@ -246,7 +255,8 @@ class Jeu(Tk):
 		self.ListeBoxMotATrouver.pack()
 
 		# Boutton pour quitter la partie
-		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",activeforeground = "white",command= lambda:back_menu(self), font = font.Font(size=15))
+		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "red", activebackground = "red", fg = "white",
+			activeforeground = "white",command= lambda:back_menu(self), font = font.Font(size=15))
 		self.leaveBtn.place(x = 325, y = 550) # emplacement forcé sur des pixel précis
 
 		# Label qui affiche si le mot séléctionné est bon ou pas
@@ -284,7 +294,7 @@ class Jeu(Tk):
 					self.var.set(self.listeMot)
 					self.mot.valider_mot()
 					if len(self.listeMot) == 0:
-						self.ValideLabel.configure(text = "Tu as gagné", fg = "green")
+						self.ValideLabel.configure(text = "Tu as gagné !", fg = "green")
 						# arreter le timer
 					else:
 						self.ValideLabel.configure(text = "Vous avez trouvé le mot !", fg = "green")
