@@ -118,7 +118,7 @@ class Creation(Tk):
 		self.nouvelleGrille = [["" for i in range(9)] for i in range(9)]
 		# Liste des mots que le joueur veut ajouter
 		self.listeMot = []
-
+		
 		# Frame qui va comporter l'entré pour le nom de la grille
 		self.nomFrame = Frame(self.GrilleLabelFrame, bg = "#45458B")
 		self.nomFrame.pack(side = TOP,padx = 75)
@@ -157,11 +157,7 @@ class Creation(Tk):
 		# Boutton pour revenir au menu
 		self.leaveBtn = Button(self,text="Revenir au Menu",bg = "#C22955", activebackground = "#D7436D", fg = "white",
 			activeforeground = "white",command = self.back_menu, font = font.Font(size=15))
-		self.leaveBtn.pack()
-
-		# Frame bidon qui sert à 'centrer' la listbox
-		self.bidonFrame = Frame(self,bg = "#45458B", height = 200)
-		self.bidonFrame.pack(side = BOTTOM)
+		self.leaveBtn.pack(side = BOTTOM, pady = 40)
 
 		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
 		self.MotATrouveLabelFrame = LabelFrame(self, text = "Liste de mots", font = font.Font(size = 15), bg = "#45458B")
@@ -220,16 +216,23 @@ class Creation(Tk):
 
 	def save_grille(self):
 		# vérification si un fichier existe déjà en ce nom
-		liste_de_grille = glob.glob("grille/*.txt")
-		liste_de_mot = glob.glob("mot/*.txt")
+		liste_de_grille = glob.glob("grille/*.txt") # Liste des fichiers texte des grilles qui apparaissent dans le répértoire
+		liste_de_mot = glob.glob("mot/*.txt") # Liste des fichier texte des mots qui apparaissent dans le répértoire
 		fileName = self.fileName.get()
+
+		if len(fileName) < 4: # Si la taille du nom de la grille est inférieur à 4
+			# Label d'erreur
+			self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+				text = "Minimum 4 lettres dans le nom de la grille")
+			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			return 1
+
 
 		for i in range(len(liste_de_grille)):
 			liste_de_grille[i] = liste_de_grille[i].replace('grille/','') # For ubuntu
 			liste_de_grille[i] = liste_de_grille[i].replace('grille\\','') # For windows
 			liste_de_grille[i] = liste_de_grille[i].replace('.txt','')
-
-		print(liste_de_mot)
 
 		for i in range(len(liste_de_mot)):
 			if len(liste_de_mot) > 0:
@@ -237,33 +240,50 @@ class Creation(Tk):
 				liste_de_mot[i] = liste_de_mot[i].replace('grille\\','') # For windows
 				liste_de_mot[i] = liste_de_mot[i].replace('.txt','')
 
-		if fileName not in liste_de_mot and fileName not in liste_de_grille:
-			with open(f"grille/{fileName}.txt", 'w') as grilleFile:
-				for x in range(9):
-					for y in range(9):
-						if y == 8:
-							grilleFile.write(self.nouvelleGrille[x][y])
+		if fileName not in liste_de_mot and fileName not in liste_de_grille: # Si le nom choisis par le joueur n'éxiste pas déjà
+			if self.nouvelleGrille[0][0] != "" and len(self.listeMot) != 0: # Si l'une des deux liste est vide
+				with open(f"grille/{fileName}.txt", 'w') as grilleFile: # On ouvre un nouveau fichier avec le nom
+					for x in range(9):
+						for y in range(9):
+							if y == 8: # Si on arrive à la dernière lettre
+								grilleFile.write(self.nouvelleGrille[x][y]) # écriture de la lettre dans le fichier 
+							else: # Si on est pas à la dernière lettre
+								grilleFile.write(self.nouvelleGrille[x][y]+',') # écriture de la lettre dans le fichier avec une virgule après
+							
+							self.nouvelleGrille[x][y] = ""
+							self.lettreLabelListe[x][y].configure(text = "")
+
+						grilleFile.writelines("\n")
+
+				with open(f"mot/{fileName}.txt", 'w') as motFile: # Ouverture d'un nouveau fichier avec le nom de fichier du joueur
+					for i in range(len(self.listeMot)-1,-1,-1): # pour chaque mots
+						if i == 0: # Si on arrive au dernier mot
+							motFile.write(self.listeMot[i]) # Écriture du mot sans virgule
 						else:
-							grilleFile.write(self.nouvelleGrille[x][y]+',')
-					grilleFile.writelines("\n")
-			print("Grille créé correctement")
+							motFile.write(self.listeMot[i]+',') # Écriture du mot avec la virgule après
+						self.listeMot.pop(i)
+					self.var.set(self.listeMot)
 
-			with open(f"mot/{fileName}.txt", 'w') as motFile:
-				for i in range(len(self.listeMot)):
-					if i == len(self.listeMot)-1:
-						motFile.write(self.listeMot[i])
-					else:
-						motFile.write(self.listeMot[i]+',')
-			print("Mot créé correctement")
-
-
+			else:
+				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+					text = "Générez une grille d'abord !")
+				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+		else:
+			# Label d'erreur
+			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+				text = "Une grille ou Mot éxiste déjà avec ce nom")
+			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 
 	def supprimer_mot(self):
+		
 		try:
-			self.listeMot.pop(self.ListeBoxMotATrouver.curselection()[0])
-			self.var.set(self.listeMot)
-		except:
+			self.listeMot.pop(self.ListeBoxMotATrouver.curselection()[0]) # On supprime de la liste le mot qui est selectionné dans la listBox
+			self.var.set(self.listeMot) # On actualise la list box avec la nouvelle liste
+		except: # Si on ne peut pas supprimer c'est que le joueur n'as pas sélectonné un mot dans la liste box
+			# Label d'erreur
 			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
 				text = "Veuillez sélectionner un mot")
 			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
@@ -271,42 +291,34 @@ class Creation(Tk):
 
 
 	def add_mot(self):
-		if len(self.listeMot) < 10:
-			if not self.space_word() and not self.MotEntry.get() == "":
-				self.listeMot.append(self.MotEntry.get())
-				self.MotEntry.delete(0,len(self.MotEntry.get()))
-				self.var.set(self.listeMot)
+
+		if len(self.listeMot) < 10: # Si la list box n'as pas plus de 10 mots
+			if not self.space(self.MotEntry) and not self.MotEntry.get() == "": # Si il n'ya pas de mots dans le
+				self.listeMot.append(self.MotEntry.get()) # Ajout du mot dans la liste des mots
+				self.MotEntry.delete(0,len(self.MotEntry.get())) # Suppression du mot de l'entrée
+				self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
 			else:
+				# Label d'erreur
 				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
 					text = "Entrez un mot sans espaces")
 				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		else:
+			# Label d'erreur
 			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
 				text = "Nombre maximum de 10 mots")
 			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 
-	def space_filename(self):
-		fileName = self.fileName.get()
+	def space(self,entry): # Méthode qui renvoie True si il y un espace dans la chaine donner par l'entrée
+		fileName = entry.get() # Récupération de la chaine de caractère
 		indc = 0
 		space = False
 
-		while not space and indc < len(fileName):
+		while not space and indc < len(fileName): #Tant qu'il n'y a pas d'espace et qu'on a pas fini de parcourir la chaine
 			space = fileName[indc] == " "
-			indc += 1
-
-		return space
-
-	def space_word(self):
-		word = self.MotEntry.get()
-		indc = 0
-		space = False
-
-		while not space and indc < len(word):
-			space = word[indc] == " "
 			indc += 1
 
 		return space
@@ -329,47 +341,39 @@ class Creation(Tk):
 	# Méthode qui retourne vrai si le joueur a entré plus d'une lettre dans l'entrée
 	def plus_une_lettre(self):
 		for x in range(len(self.entryGrille)):
-				for y in range(len(self.entryGrille[0])):
-					if len(self.entryGrille[x][y].get()) > 1:
-						return True
+			for y in range(len(self.entryGrille[0])):
+				if len(self.entryGrille[x][y].get()) > 1:
+					return True
 		return False
 
 
 	# Méthode qui transforme la nouvelle grille en vrai grille à l'aide des entrée
 	def transformer(self):
-		if len(self.fileName.get()) > 3:
-			if not self.space_filename():
-				if self.plus_une_lettre():
-					self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-						text = "Insérez qu'une seule lettre dans chaque case")
-					self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
-					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
-				else:
-					for x in range(len(self.entryGrille)):
-						for y in range(len(self.entryGrille[0])):
-							if self.entryGrille[x][y].get() != "":
-								self.nouvelleGrille[x][y] = self.entryGrille[x][y].get().upper()
-							else:
-								self.nouvelleGrille[x][y] = self.letters[random.randint(0,25)]
-					self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "green", font = font.Font(size = 14),
-						text = f"La grille {self.fileName.get()} est généré")
-					self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
-					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+		
+		if not self.space(self.fileName): # Si le nom ne comporte pas d'espaces
+			if not self.plus_une_lettre(): # Si il y a qu'une seule lettre dans chaque entrèe
 
-					self.affichage_grille()
+				fileName = self.fileName.get()
+				for x in range(len(self.entryGrille)):
+					for y in range(len(self.entryGrille[0])):
+						if self.entryGrille[x][y].get() != "": # Si l'entrée n'est pas vide
+							self.nouvelleGrille[x][y] = self.entryGrille[x][y].get().upper() # affectation de chaque lettre des entrèes dans la liste
+						else:# Si l'entrèe est vide
+							self.nouvelleGrille[x][y] = self.letters[random.randint(0,25)] # Ajout d'une lettre au aléatoire dans la liste
+				self.affichage_grille()
+
 			else:
+				# Label d'erreur
 				self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-					text = "Pas d'espaces dans le nom")
+					text = "Insérez qu'une seule lettre dans chaque case")
 				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
-
 		else:
+			# Label d'erreur
 			self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-				text = "Minimum 4 lettres dans le nom de la grille")
+				text = "Pas d'espaces dans le nom")
 			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
-
-
 
 
 # Class de la fenetre de jeu
@@ -541,21 +545,31 @@ class Lettre:
 	
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué
 
-		if self.isClicked and not self.isValid: # Si la lettre est déja cliqué
-			self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE") # On remet une couleur par défaut 
-			self.isClicked = False # Elle devient plus cliqué
-			self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
-			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
-		
-		elif not self.isClicked and not self.isValid: # Si la lettre n'est pas encore cliqué et quelle est pas validé
-			self.boutton.configure(bg = "#995AD1",activebackground="#995AD1") # On change sa couleur pour dire qu'elle est cliqué
-			self.isClicked = True # Elle devient cliqué
-			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
-			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+		print(f"etat validé: {self.isValid}, état cliqué: {self.isClicked}")
 
-		elif self.isClicked and self.isValid: # Si la lettre est déjà cliqué et déjà validé
-			self.mot.ajouter_Lettre(self) # On l'ajoute au mot
-			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+		if self.isClicked: # Si la lettre est déjà cliqué
+			if not self.isValid: # Si la lettre n'est pas encore validé
+				self.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE") # On remet une couleur par défaut 
+				self.isClicked = False # Elle devient plus cliqué
+				self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
+				self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
+			else: # Si la lettre est déjà validé
+				self.isClicked = False # Elle devient plus cliqué
+				self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
+				self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
+		else: # Si la lettre est pas encore cliqué
+			if not self.isValid: # Si la lettre n'est pas validé
+				self.boutton.configure(bg = "#995AD1",activebackground="#995AD1") # On change sa couleur pour dire qu'elle est cliqué
+				self.isClicked = True # Elle devient 
+				self.mot.ajouter_Lettre(self) # On l'ajoute au mot
+				self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
+
+			else: # Si la lettre est déjà validé
+				self.isClicked = True # Elle devient 
+				self.mot.ajouter_Lettre(self) # On l'ajoute au mot
+				self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
 
 
 # Class du mot
@@ -576,6 +590,7 @@ class Mot:
 	def valider_mot(self):
 		for lettre in self.text:
 			lettre.isValid = True
+			lettre.isClicked = False
 			lettre.boutton.configure(bg = "green", activebackground = "#359221")
 
 	def ajouter_Lettre(self, lettre):
