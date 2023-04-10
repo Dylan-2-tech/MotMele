@@ -1,8 +1,7 @@
 
-from ClassGame import *
+from ClassGameCTk import *
 
 
 Jeu = Menu()
 
 Jeu.mainloop()
-
