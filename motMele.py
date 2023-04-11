@@ -2,6 +2,6 @@
 from ClassGameCTk import *
 
 
-Jeu = Menu()
+Jeu = Creation()
 
 Jeu.mainloop()
