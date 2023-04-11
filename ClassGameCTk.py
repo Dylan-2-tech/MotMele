@@ -119,16 +119,16 @@ class Creation(CTk):
 		
 		# Frame qui va comporter l'entré pour le nom de la grille
 		self.nomFrame = CTkFrame(self.GrilleFrame, height = 50)
-		self.nomFrame.grid(row = 0, columnspan = 2, sticky = "nwe")
+		self.nomFrame.grid(row = 0, columnspan = 10, sticky = "nwe")
 		self.nomFrame.grid_propagate(0)
 
 		# Label qui précise où entrer le nom de la grille que le joueur veut générer
 		self.nomLabel = CTkLabel(self.nomFrame, text = "Nom:", font = CTkFont(size = 15))
-		self.nomLabel.grid(row = 0, column = 0, padx = (50,0))
+		self.nomLabel.grid(row = 0, column = 0, padx = (100,0), pady = (10,0))
 
 		# Entry qui va prendre le nom de la grille que le joueur veut créer
 		self.fileName = CTkEntry(self.nomFrame, font = CTkFont(size = 15))
-		self.fileName.grid(row = 0, column = 1, padx = (10,0))
+		self.fileName.grid(row = 0, column = 1, padx = (10,0), pady = (10,0))
 
 		"""
 		# label qui va contenir les options au fonds du labelFrame
@@ -196,20 +196,23 @@ class Creation(CTk):
 				label.place(x = posx, y = posy)
 				posx += 45
 			posy += 45
-
+		"""
 		# Affichage de la grille d'entrée
-		posy = 30
+		posy = 50
 		r = 0
 		for listeEntry in self.entryGrille:
 			posx = 30
 			c = 0
 			for entry in listeEntry:
-				entry.grid(row = r, column = c, padx = (10,0), pady = (10,0))
+				if c == 0:
+					entry.grid(row = r, column = c, padx = (20,0), pady = (10,0))
+				else:
+					entry.grid(row = r, column = c, padx = (10,0), pady = (10,0))
 				posx += 45
 				c += 1
 			posy += 45
 			r += 1
-		"""
+		
 
 		self.mainloop()
 		
