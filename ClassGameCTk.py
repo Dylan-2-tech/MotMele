@@ -6,6 +6,9 @@ from customtkinter import CTkFrame
 from customtkinter import CTkLabel
 from customtkinter import CTkEntry
 from tkinter import CENTER
+from tkinter import Listbox
+from tkinter import StringVar
+from tkinter import font
 import random
 import string
 import glob
@@ -64,7 +67,6 @@ class Menu(CTk):
 
 	def select_grille(self,choice):
 		self.grille = choice
-		print(self.grille)
 
 	# Méthode qui va servir de lancer la partie et de fermer la fnetre du menu
 	def launch_game(self):
@@ -101,13 +103,12 @@ class Creation(CTk):
 		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
 		self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
 
-		
 		# Toutes les lettres de l'alphabet en majuscules
 		self.letters = string.ascii_uppercase
 
 		# Frame qui va contenir la grille et les options de création
-		self.GrilleFrame = CTkFrame(self,width = 450, height = 650)
-		self.GrilleFrame.grid(column = 0, sticky = 'nswe', rowspan = 2, padx = 20, pady = 20)
+		self.GrilleFrame = CTkFrame(self,width = 450, height = 660)
+		self.GrilleFrame.grid(row = 0, column = 0, sticky = 'nwe', rowspan = 2, padx = 20, pady = 20)
 		self.GrilleFrame.grid_propagate(0)
 
 		# Double liste des entré qui vont prendre les lettre du joueur pour créer la grille
@@ -119,7 +120,7 @@ class Creation(CTk):
 		
 		# Frame qui va comporter l'entré pour le nom de la grille
 		self.nomFrame = CTkFrame(self.GrilleFrame, height = 50)
-		self.nomFrame.grid(row = 0, columnspan = 10, sticky = "nwe")
+		self.nomFrame.grid(row = 0, columnspan = 10, sticky = "nwe", padx = (20,0), pady = (10,0))
 		self.nomFrame.grid_propagate(0)
 
 		# Label qui précise où entrer le nom de la grille que le joueur veut générer
@@ -130,89 +131,89 @@ class Creation(CTk):
 		self.fileName = CTkEntry(self.nomFrame, font = CTkFont(size = 15))
 		self.fileName.grid(row = 0, column = 1, padx = (10,0), pady = (10,0))
 
-		"""
-		# label qui va contenir les options au fonds du labelFrame
-		self.OptionLabel = Label(self.GrilleLabelFrame, bg = "#45458B")
-		self.OptionLabel.pack(side = BOTTOM, fill = X,padx = 80, pady = 10)
-
+		# Frame qui va contenir les options au fonds du labelFrame
+		self.OptionFrame = CTkFrame(self.GrilleFrame, height = 150)
+		self.OptionFrame.grid(row = 10, columnspan = 9, pady = (10,0),padx = (20,0), sticky = "we")
+		self.OptionFrame.grid_propagate(0)
+	
 		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self.OptionLabel,text = "Clear",bg = "#337292", activebackground = "#4991B6",
-		 font = font.Font(size = 14), fg = "white", command = self.clear)
-		self.ClearLettersBtn.pack(side = RIGHT)
+		self.ClearLettersBtn = CTkButton(self.OptionFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
+		 font = CTkFont(size = 14), command = self.clear)
+		self.ClearLettersBtn.grid()
 
 		# Boutton pour creer des grilles
-		self.CreationBoutton = Button(self.OptionLabel,text = "Générer",font = font.Font(size = 15), bg = "#2C8031",
-		 fg = "white", activebackground = "#3E9D44", activeforeground = "white",command = self.transformer)
-		self.CreationBoutton.pack(pady = 5, side = LEFT)
-
-		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
-		self.AffichageLabelFrame = LabelFrame(self, text = "Affichage", font = font.Font(size = 20), width = 425, labelanchor = 'n', bg = "#45458B")
-		self.AffichageLabelFrame.pack(side = RIGHT, fill = Y, pady = 20, padx = 20)
-		self.AffichageLabelFrame.pack_propagate(0)
-
-		# Double liste de Label qui vont représenté la grille du joueur lors de l'affichage
-		self.lettreLabelListe = [[Label(self.AffichageLabelFrame, bg = "#45458B", font = font.Font(size = 25), text = self.nouvelleGrille[x][y]) for y in range (9)] for x in range (9)]
-
-		# Boutton pour revenir au menu
-		self.leaveBtn = Button(self,text="Revenir au Menu",bg = "#C22955", activebackground = "#D7436D", fg = "white",
-			activeforeground = "white",command = self.back_menu, font = font.Font(size=15))
-		self.leaveBtn.pack(side = BOTTOM, pady = 40)
+		self.CreationBoutton = CTkButton(self.OptionFrame,text = "Générer",font = CTkFont(size = 15), fg_color = ("#3E9D44","#2C8031"),
+		 hover_color = ("#2C8031","#3E9D44"), command = self.transformer)
+		self.CreationBoutton.grid(padx = (10,0), row = 0, column = 1)
 
 		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
-		self.MotATrouveLabelFrame = LabelFrame(self, text = "Liste de mots", font = font.Font(size = 15), bg = "#45458B")
-		self.MotATrouveLabelFrame.pack(fill = X, side = BOTTOM, pady = 20, ipadx = 20)
-
-		# Frame qui va comporter l'entrée du mot et le boutton supprimer
-		self.MotOptionFrame = Frame(self.MotATrouveLabelFrame, bg = "#45458B")#45458B
-		self.MotOptionFrame.pack(fill = X, side = TOP)
+		self.MotATrouveFrame = CTkFrame(self, width = 250, height = 460)
+		self.MotATrouveFrame.grid(row = 0,column = 1,padx = (0,20))
+		self.MotATrouveFrame.grid_propagate(0)
 
 		# Entrée qui va accueillir le mot que le joueur veut ajouter à sa liste
-		self.MotEntry = Entry(self.MotOptionFrame, bg = "#555591", font = font.Font(size = 15))
-		self.MotEntry.pack(side = TOP)
+		self.MotEntry = CTkEntry(self.MotATrouveFrame, font = CTkFont(size = 25), width = 10)
+		self.MotEntry.grid(row = 0, column = 0, columnspan = 2, sticky = 'ew', padx = (10,0), pady = (10,10))
 		self.MotEntry.bind('<Return>',lambda event:self.add_mot())
 
 		# Boutton pour retirer le mot sélectionné
-		self.suppMot = Button(self.MotOptionFrame, text = "Supprimer", bg = "#C22955", activebackground ="#D7436D",
-			font = font.Font(size = 12), command = self.supprimer_mot)
-		self.suppMot.pack(side = TOP, pady = 10)
+		self.suppMot = CTkButton(self.MotATrouveFrame, text = "Supprimer", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
+			font = CTkFont(size = 12), command = self.supprimer_mot)
+		self.suppMot.grid(row = 1, columnspan = 2, pady = (10,0))
 
 		# List Box qui va comporter la liste de mots que le joueur doit trouver
 		self.var = StringVar(value = self.listeMot)
-		self.ListeBoxMotATrouver = Listbox(self.MotATrouveLabelFrame, font = font.Font(size = 17), width = 16 ,
-			activestyle = 'none', selectbackground = "#505092", bg = "#45458B", fg = "black",
+		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 20), width = 13, height = 10,
+			activestyle = 'none', selectbackground = "light grey", bg = "grey", fg = "white",
 			borderwidth=0, highlightthickness=0, listvariable = self.var)
-		self.ListeBoxMotATrouver.pack(fill = BOTH)
+		self.ListeBoxMotATrouver.grid(columnspan = 2, row = 2, padx = (15,0), pady = 20, sticky = 'ew')
+
+		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
+		self.AffichageFrame = CTkFrame(self, width = 425, height = 660)
+		self.AffichageFrame.grid(row = 0, column = 2, pady = 20)
+		self.AffichageFrame.grid_propagate(0)
+
+		# Double liste de Label qui vont représenté la grille du joueur lors de l'affichage
+		self.lettreLabelListe = [[CTkLabel(self.AffichageFrame,font = CTkFont(size = 25), text = self.nouvelleGrille[x][y]) for y in range (9)] for x in range (9)]
+		
+		# Frame qui va comporter le bouton enregistrer
+		self.SaveFrame = CTkFrame(self.AffichageFrame)
+		self.SaveFrame.grid(row = 10, columnspan = 9, sticky = 'ensw')
+		self.SaveFrame.grid_propagate(0)
 
 		# Boutton pour enregistrer la grille généré en fichier txt ainsi que les mot
-		self.SaveButton = Button(self.AffichageLabelFrame,text = "Enregistrer", bg = "#644D8B", activebackground = "#755CA0",
-			font = font.Font(size = 30), command = self.save_grille)
-		self.SaveButton.pack(side = BOTTOM, pady = 75) 
+		self.SaveButton = CTkButton(self.SaveFrame, text = "Enregistrer", fg_color = ("#755CA0","#644D8B"), hover_color = ("#644D8B","#755CA0"),
+			font = CTkFont(size = 30), command = self.save_grille)
+		self.SaveButton.grid(row = 0) 
 
+		# Boutton pour revenir au menu
+		self.leaveBtn = CTkButton(self,text="Revenir au Menu",fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
+			command = self.back_menu, font = CTkFont(size=20))
+		self.leaveBtn.grid(row = 1, column = 1)
+		
 		# Affichage des labels pour l'affichage des lettres de la grille
-		posy = 20
+		r = 1
 		for listeLabel in self.lettreLabelListe:
-			posx = 15
+			c = 0
 			for label in listeLabel:
-				label.place(x = posx, y = posy)
-				posx += 45
-			posy += 45
-		"""
+				if c == 0:
+					label.grid(row = r, column = c, padx = (40,0), pady = (20,0))
+				else:
+					label.grid(row = r, column = c, padx = (20,0), pady = (20,0))
+				c += 1
+			r += 1
+		
 		# Affichage de la grille d'entrée
-		posy = 50
-		r = 0
+		r = 1
 		for listeEntry in self.entryGrille:
-			posx = 30
 			c = 0
 			for entry in listeEntry:
 				if c == 0:
 					entry.grid(row = r, column = c, padx = (20,0), pady = (10,0))
 				else:
 					entry.grid(row = r, column = c, padx = (10,0), pady = (10,0))
-				posx += 45
 				c += 1
-			posy += 45
 			r += 1
-		
 
 		self.mainloop()
 		
