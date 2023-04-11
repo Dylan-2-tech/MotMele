@@ -24,8 +24,8 @@ class Menu(CTk):
 		super().__init__()
 		self.title("Menu") # Titre du jeu
 		self.geometry("400x300+2000+250") # Dimmension de la fenetre
-		self.minsize(width = 400, height = 300)
-		self.maxsize(width = 400, height = 300)
+		self.minsize(width = 350, height = 250)
+		self.maxsize(width = 450, height = 350)
 
 		# Présentation des grilles du jeu dans la comboBox
 		liste_de_grille = glob.glob("grille/*.txt")
@@ -100,8 +100,8 @@ class Creation(CTk):
 
 		self.title("Création de grilles") # Titre du jeu
 		self.geometry("1200x700+300+150") # Dimmension de la fenetre
-		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
-		self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
+		#self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
+		#self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
 
 		# Toutes les lettres de l'alphabet en majuscules
 		self.letters = string.ascii_uppercase
@@ -130,21 +130,16 @@ class Creation(CTk):
 		# Entry qui va prendre le nom de la grille que le joueur veut créer
 		self.fileName = CTkEntry(self.nomFrame, font = CTkFont(size = 15))
 		self.fileName.grid(row = 0, column = 1, padx = (10,0), pady = (10,0))
-
-		# Frame qui va contenir les options au fonds du labelFrame
-		self.OptionFrame = CTkFrame(self.GrilleFrame, height = 150)
-		self.OptionFrame.grid(row = 10, columnspan = 9, pady = (10,0),padx = (20,0), sticky = "we")
-		self.OptionFrame.grid_propagate(0)
 	
 		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = CTkButton(self.OptionFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
-		 font = CTkFont(size = 14), command = self.clear)
-		self.ClearLettersBtn.grid()
+		self.ClearLettersBtn = CTkButton(self.GrilleFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
+		 font = CTkFont(size = 17), command = self.clear)
+		self.ClearLettersBtn.grid(row = 11, column = 0,columnspan = 9)
 
 		# Boutton pour creer des grilles
-		self.CreationBoutton = CTkButton(self.OptionFrame,text = "Générer",font = CTkFont(size = 15), fg_color = ("#3E9D44","#2C8031"),
+		self.CreationBoutton = CTkButton(self.GrilleFrame,text = "Générer",font = CTkFont(size = 17), fg_color = ("#3E9D44","#2C8031"),
 		 hover_color = ("#2C8031","#3E9D44"), command = self.transformer)
-		self.CreationBoutton.grid(padx = (10,0), row = 0, column = 1)
+		self.CreationBoutton.grid(padx = (10,0), row = 10, column = 0,columnspan = 9)
 
 		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
 		self.MotATrouveFrame = CTkFrame(self, width = 250, height = 460)
@@ -158,7 +153,7 @@ class Creation(CTk):
 
 		# Boutton pour retirer le mot sélectionné
 		self.suppMot = CTkButton(self.MotATrouveFrame, text = "Supprimer", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
-			font = CTkFont(size = 12), command = self.supprimer_mot)
+			font = CTkFont(size = 17), command = self.supprimer_mot)
 		self.suppMot.grid(row = 1, columnspan = 2, pady = (10,0))
 
 		# List Box qui va comporter la liste de mots que le joueur doit trouver
@@ -170,26 +165,26 @@ class Creation(CTk):
 
 		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
 		self.AffichageFrame = CTkFrame(self, width = 425, height = 660)
-		self.AffichageFrame.grid(row = 0, column = 2, pady = 20)
+		self.AffichageFrame.grid(row = 0, column = 2, pady = 20, padx = (10,0))
 		self.AffichageFrame.grid_propagate(0)
 
+		# Frame on va apparaitre la grille
+		self.GrilleFrame = CTkFrame(self.AffichageFrame, width = 400, height = 470)
+		self.GrilleFrame.grid(row = 0, columnspan = 2, padx = (10,0), pady = 10)
+		self.GrilleFrame.grid_propagate(0)
+
 		# Double liste de Label qui vont représenté la grille du joueur lors de l'affichage
-		self.lettreLabelListe = [[CTkLabel(self.AffichageFrame,font = CTkFont(size = 25), text = self.nouvelleGrille[x][y]) for y in range (9)] for x in range (9)]
-		
-		# Frame qui va comporter le bouton enregistrer
-		self.SaveFrame = CTkFrame(self.AffichageFrame)
-		self.SaveFrame.grid(row = 10, columnspan = 9, sticky = 'ensw')
-		self.SaveFrame.grid_propagate(0)
+		self.lettreLabelListe = [[CTkLabel(self.GrilleFrame,font = CTkFont(size = 25), text = self.nouvelleGrille[x][y]) for y in range (9)] for x in range (9)]
 
 		# Boutton pour enregistrer la grille généré en fichier txt ainsi que les mot
-		self.SaveButton = CTkButton(self.SaveFrame, text = "Enregistrer", fg_color = ("#755CA0","#644D8B"), hover_color = ("#644D8B","#755CA0"),
+		self.SaveButton = CTkButton(self.AffichageFrame, text = "Enregistrer", fg_color = ("#755CA0","#644D8B"), hover_color = ("#644D8B","#755CA0"),
 			font = CTkFont(size = 30), command = self.save_grille)
-		self.SaveButton.grid(row = 0) 
+		self.SaveButton.grid(row = 1, column = 0, columnspan = 2, pady = (10,0))
 
 		# Boutton pour revenir au menu
-		self.leaveBtn = CTkButton(self,text="Revenir au Menu",fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
+		self.leaveBtn = CTkButton(self.AffichageFrame, text="Revenir au Menu", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
 			command = self.back_menu, font = CTkFont(size=20))
-		self.leaveBtn.grid(row = 1, column = 1)
+		self.leaveBtn.grid(row = 2, column = 0, columnspan = 2, pady = (20,0))
 		
 		# Affichage des labels pour l'affichage des lettres de la grille
 		r = 1
@@ -197,7 +192,7 @@ class Creation(CTk):
 			c = 0
 			for label in listeLabel:
 				if c == 0:
-					label.grid(row = r, column = c, padx = (40,0), pady = (20,0))
+					label.grid(row = r, column = c, padx = (27,0), pady = (20,0))
 				else:
 					label.grid(row = r, column = c, padx = (20,0), pady = (20,0))
 				c += 1
@@ -231,9 +226,9 @@ class Creation(CTk):
 
 		if len(fileName) < 4: # Si la taille du nom de la grille est inférieur à 4
 			# Label d'erreur
-			self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
 				text = "Minimum 4 lettres dans le nom de la grille")
-			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))					
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 			return 1
 
@@ -274,15 +269,15 @@ class Creation(CTk):
 					self.var.set(self.listeMot)
 
 			else:
-				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-					text = "Générez une grille d'abord !")
-				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+				self.ERRORLABEL = CTkLabel(self.AffichageFrame,text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+					text = "Générez une grille et ses mots d'abord !")
+				self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 		else:
 			# Label d'erreur
-			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-				text = "Une grille ou Mot éxiste déjà avec ce nom")
-			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 18),
+				text = "Une Grille ou liste de Mot éxiste déjà avec ce nom")
+			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 
@@ -293,9 +288,9 @@ class Creation(CTk):
 			self.var.set(self.listeMot) # On actualise la list box avec la nouvelle liste
 		except: # Si on ne peut pas supprimer c'est que le joueur n'as pas sélectonné un mot dans la liste box
 			# Label d'erreur
-			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 15),
 				text = "Veuillez sélectionner un mot")
-			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 2)
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 
@@ -308,16 +303,16 @@ class Creation(CTk):
 				self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
 			else:
 				# Label d'erreur
-				self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+				self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 15),
 					text = "Entrez un mot sans espaces")
-				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)
+				self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		else:
 			# Label d'erreur
-			self.ERRORLABEL = Label(self, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 15),
 				text = "Nombre maximum de 10 mots")
-			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)
+			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 
