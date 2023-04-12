@@ -1,0 +1,316 @@
+
+#### Importation des librairie ####
+import customtkinter
+from customtkinter import CTk
+from customtkinter import CTkButton
+from customtkinter import CTkFont
+from customtkinter import CTkFrame
+from customtkinter import CTkLabel
+from customtkinter import CTkEntry
+from tkinter import CENTER
+from tkinter import Listbox
+from tkinter import StringVar
+from tkinter import font
+import random
+import string
+import glob
+
+customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
+
+
+# Classe de la fenetre de création de grille
+class Creation(CTk):
+
+	def __init__(self):
+		super().__init__()
+
+		self.title("Création de grilles") # Titre du jeu
+		self.geometry("1200x700+2000+150") # Dimmension de la fenetre
+		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
+		self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
+
+		# Toutes les lettres de l'alphabet en majuscules
+		self.letters = string.ascii_uppercase
+
+		# Frame qui va contenir la grille et les options de création
+		self.GrilleFrame = CTkFrame(self,width = 450, height = 660)
+		self.GrilleFrame.grid(row = 0, column = 0, sticky = 'nwe', rowspan = 2, padx = 20, pady = 20)
+		self.GrilleFrame.grid_propagate(0)
+
+		# Double liste des entré qui vont prendre les lettre du joueur pour créer la grille
+		self.entryGrille = [[CTkEntry(self.GrilleFrame,font = CTkFont(size = 25), width = 2, corner_radius = 10) for i in range(9)] for i in range(9)]
+		# Double liste de charactère vide qui représente la grille que le joueur va créer
+		self.nouvelleGrille = [["" for i in range(9)] for i in range(9)]
+		# Liste des mots que le joueur veut ajouter
+		self.listeMot = []
+		
+		# Frame qui va comporter l'entré pour le nom de la grille
+		self.nomFrame = CTkFrame(self.GrilleFrame, height = 50)
+		self.nomFrame.grid(row = 0, columnspan = 10, sticky = "nwe", padx = (20,0), pady = (10,0))
+		self.nomFrame.grid_propagate(0)
+
+		# Label qui précise où entrer le nom de la grille que le joueur veut générer
+		self.nomLabel = CTkLabel(self.nomFrame, text = "Nom:", font = CTkFont(size = 15))
+		self.nomLabel.grid(row = 0, column = 0, padx = (100,0), pady = (10,0))
+
+		# Entry qui va prendre le nom de la grille que le joueur veut créer
+		self.fileName = CTkEntry(self.nomFrame, font = CTkFont(size = 15))
+		self.fileName.grid(row = 0, column = 1, padx = (10,0), pady = (10,0))
+
+		# Boutton pour creer des grilles
+		self.CreationBoutton = CTkButton(self.GrilleFrame,text = "Générer",font = CTkFont(size = 25), fg_color = ("#3E9D44","#2C8031"),
+		 hover_color = ("#2C8031","#3E9D44"), command = self.transformer)
+		self.CreationBoutton.grid(row = 10, pady = (20,0), column = 0,columnspan = 9)
+	
+		# Bouton pour deséléctionné toutes les lettres
+		self.ClearLettersBtn = CTkButton(self.GrilleFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
+		 font = CTkFont(size = 20), command = self.clear)
+		self.ClearLettersBtn.grid(row = 11, pady = (20,20), column = 0, columnspan = 9)
+
+		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
+		self.MotATrouveFrame = CTkFrame(self, width = 250, height = 460)
+		self.MotATrouveFrame.grid(row = 0,column = 1,padx = (0,20))
+		self.MotATrouveFrame.grid_propagate(0)
+
+		# Entrée qui va accueillir le mot que le joueur veut ajouter à sa liste
+		self.MotEntry = CTkEntry(self.MotATrouveFrame, font = CTkFont(size = 30), width = 10)
+		self.MotEntry.grid(row = 0, column = 0, columnspan = 2, sticky = 'ew', pady = (10,10), padx = (20,0) )
+		self.MotEntry.bind('<Return>',lambda event:self.add_mot())
+
+		# Boutton pour retirer le mot sélectionné
+		self.suppMot = CTkButton(self.MotATrouveFrame, text = "Supprimer", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
+			font = CTkFont(size = 17), command = self.supprimer_mot)
+		self.suppMot.grid(row = 1, column = 0, columnspan = 2, pady = (10,0), padx = (20,0))
+
+		# List Box qui va comporter la liste de mots que le joueur doit trouver
+		self.var = StringVar(value = self.listeMot)
+		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 20), width = 14, height = 10,
+			activestyle = 'none', selectbackground = "light grey", bg = "grey", fg = "black",
+			borderwidth=0, highlightthickness=0, listvariable = self.var)
+		self.ListeBoxMotATrouver.grid(column = 0, row = 2, columnspan = 2, padx = (20,0), pady = 20, sticky = 'ew')
+
+		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
+		self.AffichageFrame = CTkFrame(self, width = 425, height = 660)
+		self.AffichageFrame.grid(row = 0, column = 2, pady = 20, sticky = 'we')
+		self.AffichageFrame.grid_propagate(0)
+
+		# Frame on va apparaitre la grille
+		self.GrilleAffichageFrame = CTkFrame(self.AffichageFrame, width = 400, height = 470)
+		self.GrilleAffichageFrame.grid(row = 0, columnspan = 2, padx = (10,0), pady = 10)
+		self.GrilleAffichageFrame.grid_propagate(0)
+
+		# Double liste de Label qui vont représenté la grille du joueur lors de l'affichage
+		self.lettreLabelListe = [[CTkLabel(self.GrilleAffichageFrame,font = CTkFont(size = 25), text = self.nouvelleGrille[x][y]) for y in range (9)] for x in range (9)]
+
+		# Boutton pour enregistrer la grille généré en fichier txt ainsi que les mot
+		self.SaveButton = CTkButton(self.AffichageFrame, text = "Enregistrer", fg_color = ("#755CA0","#644D8B"), hover_color = ("#644D8B","#755CA0"),
+			font = CTkFont(size = 30), command = self.save_grille)
+		self.SaveButton.grid(row = 1, column = 0, columnspan = 2, pady = (10,0))
+
+		# Boutton pour revenir au menu
+		self.leaveBtn = CTkButton(self.AffichageFrame, text="Revenir au Menu", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
+			command = self.back_menu, font = CTkFont(size=20))
+		self.leaveBtn.grid(row = 2, column = 0, columnspan = 2, pady = (20,0))
+		
+		# Affichage des labels pour l'affichage des lettres de la grille
+		r = 1
+		for listeLabel in self.lettreLabelListe:
+			c = 0
+			for label in listeLabel:
+				if c == 0:
+					label.grid(row = r, column = c, padx = (27,0), pady = (20,0))
+				else:
+					label.grid(row = r, column = c, padx = (20,0), pady = (20,0))
+				c += 1
+			r += 1
+		
+		# Affichage de la grille d'entrée
+		r = 1
+		for listeEntry in self.entryGrille:
+			c = 0
+			for entry in listeEntry:
+				if c == 0:
+					entry.grid(row = r, column = c, padx = (20,0), pady = (10,0))
+				else:
+					entry.grid(row = r, column = c, padx = (10,0), pady = (10,0))
+				c += 1
+			r += 1
+
+
+		self.mainloop()
+		
+
+	def back_menu(self):
+		self.destroy()
+		Menu()
+
+
+	def save_grille(self):
+		# vérification si un fichier existe déjà en ce nom
+		liste_de_grille = glob.glob("grille/*.txt") # Liste des fichiers texte des grilles qui apparaissent dans le répértoire
+		liste_de_mot = glob.glob("mot/*.txt") # Liste des fichier texte des mots qui apparaissent dans le répértoire
+		fileName = self.fileName.get()
+
+		if len(fileName) < 4: # Si la taille du nom de la grille est inférieur à 4
+			# Label d'erreur
+			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+				text = "Minimum 4 lettres dans le nom de la grille")
+			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))					
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			return 1
+
+
+		for i in range(len(liste_de_grille)):
+			liste_de_grille[i] = liste_de_grille[i].replace('grille/','') # For ubuntu
+			liste_de_grille[i] = liste_de_grille[i].replace('grille\\','') # For windows
+			liste_de_grille[i] = liste_de_grille[i].replace('.txt','')
+
+		for i in range(len(liste_de_mot)):
+			if len(liste_de_mot) > 0:
+				liste_de_mot[i] = liste_de_mot[i].replace('grille/','') # For ubuntu
+				liste_de_mot[i] = liste_de_mot[i].replace('grille\\','') # For windows
+				liste_de_mot[i] = liste_de_mot[i].replace('.txt','')
+
+		if fileName not in liste_de_mot and fileName not in liste_de_grille: # Si le nom choisis par le joueur n'éxiste pas déjà
+			if self.nouvelleGrille[0][0] != "" and len(self.listeMot) != 0: # Si l'une des deux liste est vide
+				with open(f"grille/{fileName}.txt", 'w') as grilleFile: # On ouvre un nouveau fichier avec le nom
+					for x in range(9):
+						for y in range(9):
+							if y == 8: # Si on arrive à la dernière lettre
+								grilleFile.write(self.nouvelleGrille[x][y]) # écriture de la lettre dans le fichier 
+							else: # Si on est pas à la dernière lettre
+								grilleFile.write(self.nouvelleGrille[x][y]+',') # écriture de la lettre dans le fichier avec une virgule après
+							
+							self.nouvelleGrille[x][y] = ""
+							self.lettreLabelListe[x][y].configure(text = "")
+
+						grilleFile.writelines("\n")
+
+				with open(f"mot/{fileName}.txt", 'w') as motFile: # Ouverture d'un nouveau fichier avec le nom de fichier du joueur
+					for i in range(len(self.listeMot)-1,-1,-1): # pour chaque mots
+						if i == 0: # Si on arrive au dernier mot
+							motFile.write(self.listeMot[i]) # Écriture du mot sans virgule
+						else:
+							motFile.write(self.listeMot[i]+',') # Écriture du mot avec la virgule après
+						self.listeMot.pop(i)
+					self.var.set(self.listeMot)
+
+			else:
+				self.ERRORLABEL = CTkLabel(self.AffichageFrame,text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+					text = "Générez une grille et ses mots d'abord !")
+				self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+		else:
+			# Label d'erreur
+			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 18),
+				text = "Une Grille ou liste de Mot éxiste déjà avec ce nom")
+			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+
+
+	def supprimer_mot(self):
+		
+		try:
+			self.listeMot.pop(self.ListeBoxMotATrouver.curselection()[0]) # On supprime de la liste le mot qui est selectionné dans la listBox
+			self.var.set(self.listeMot) # On actualise la list box avec la nouvelle liste
+		except: # Si on ne peut pas supprimer c'est que le joueur n'as pas sélectonné un mot dans la liste box
+			# Label d'erreur
+			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+				text = "Veuillez sélectionner un mot")
+			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+
+
+	def add_mot(self):
+
+		inf10 = len(self.MotEntry.get()) <= 9 # Vrai si la taille ne dépasse pas 9 lettres
+
+		if inf10:
+			if len(self.listeMot) < 10: # Si la list box n'as pas plus de 10 mots
+				if not self.space(self.MotEntry) and not self.MotEntry.get() == "": # Si il n'ya pas de mots dans le
+					self.listeMot.append(self.MotEntry.get()) # Ajout du mot dans la liste des mots
+					self.MotEntry.delete(0,len(self.MotEntry.get())) # Suppression du mot de l'entrée
+					self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
+				else:
+					# Label d'erreur
+					self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+						text = "Entrez un mot sans espaces")
+					self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
+					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+
+			else:
+				# Label d'erreur
+				self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+					text = "Nombre maximum de 10 mots")
+				self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+		else:
+			# Label d'erreur
+			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
+				text = "Nombre maximum de 9 lettres")
+			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+
+
+	def space(self,entry): # Méthode qui renvoie True si il y un espace dans la chaine donner par l'entrée
+		text = entry.get() # Récupération de la chaine de caractère
+		indc = 0
+		space = False
+
+		while not space and indc < len(text): #Tant qu'il n'y a pas d'espace et qu'on a pas fini de parcourir la chaine
+			space = text[indc] == " "
+			indc += 1
+
+		return space
+
+
+	# Méthode qui s'occupe de l'affichage de la grille généré par le joueur
+	def affichage_grille(self):
+		for x in range(9):
+			for y in range(9):
+				self.lettreLabelListe[y][x].configure(text = self.nouvelleGrille[y][x])
+		
+
+	# Méthode pour nettoyer les les mots inseré par le joueur
+	def clear(self):
+		for listeEntry in self.entryGrille:
+			for entry in listeEntry:
+				entry.delete(0,len(entry.get()))
+
+
+	# Méthode qui retourne vrai si le joueur a entré plus d'une lettre dans l'entrée
+	def plus_une_lettre(self):
+		for x in range(len(self.entryGrille)):
+			for y in range(len(self.entryGrille[0])):
+				if len(self.entryGrille[x][y].get()) > 1:
+					return True
+		return False
+
+
+	# Méthode qui transforme la nouvelle grille en vrai grille à l'aide des entrée
+	def transformer(self):
+		
+		if not self.space(self.fileName): # Si le nom ne comporte pas d'espaces
+			if not self.plus_une_lettre(): # Si il y a qu'une seule lettre dans chaque entrèe
+
+				fileName = self.fileName.get()
+				for x in range(len(self.entryGrille)):
+					for y in range(len(self.entryGrille[0])):
+						if self.entryGrille[x][y].get() != "": # Si l'entrée n'est pas vide
+							self.nouvelleGrille[x][y] = self.entryGrille[x][y].get().upper() # affectation de chaque lettre des entrèes dans la liste
+						else:# Si l'entrèe est vide
+							self.nouvelleGrille[x][y] = self.letters[random.randint(0,25)] # Ajout d'une lettre au aléatoire dans la liste
+				self.affichage_grille()
+
+			else:
+				# Label d'erreur
+				self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+					text = "Insérez qu'une seule lettre dans chaque case")
+				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+		else:
+			# Label d'erreur
+			self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
+				text = "Pas d'espaces dans le nom")
+			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
+			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
