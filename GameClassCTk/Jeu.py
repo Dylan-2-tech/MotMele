@@ -14,6 +14,8 @@ from tkinter import font
 import string
 import glob
 from GameClassCTk.Lettre import Lettre
+from GameClassCTk.Mot import Mot
+import GameClassCTk.Menu as Menu
 
 customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
 
@@ -24,7 +26,6 @@ class Jeu(CTk):
 		super().__init__()
 
 		# Grille du jeu
-
 		self.grille = [line.split(',') for line  in open(f"grille/{grille}.txt")]
 		for listLettre in self.grille:
 			for i in range(len(listLettre)):
@@ -36,7 +37,7 @@ class Jeu(CTk):
 
 		# Initialisation de la fenetre du jeu
 		self.title("Mot Mélé") # Titre du jeu
-		self.geometry("1200x735+270+150") # Dimmension de la fenetre
+		self.geometry("1200x735+350+150") # Dimmension de la fenetre
 		self.minsize(width = 1200, height = 735) # Dimmension minimum de la fenetre
 
 		# Frame qui va comporter la grille de jeu
@@ -49,10 +50,57 @@ class Jeu(CTk):
 		self.GameFrame.grid(sticky = 'ensw', column = 1, row = 0, padx = (0,20), pady = 20)
 		self.GameFrame.grid_propagate(0)
 
+		# Frame qui va contenir le label qui affiche le mot
+		self.MotFrame = CTkFrame(self.GameFrame)
+		self.MotFrame.grid(row = 0, column = 0, columnspan = 2, sticky = 'ew')
+		self.MotFrame.grid_propagate(0)
+
+		# Label qui affiche le mot séléctionné
+		self.MotLabel = CTkLabel(self.MotFrame, font = CTkFont(size=40), text = "")#,fg_color = ("","")
+		self.MotLabel.grid(row = 0, column = 0, columnspan = 2, sticky = 'ensw')
+
+		# Boutton pour valider la sélection des lettres
+		self.valideBtn = CTkButton(self.GameFrame, text = "Valider",fg_color = "#2C8031", hover_color = "#3E9D44", 
+			font = CTkFont(size = 25), command = self.valider)
+		self.valideBtn.grid(row = 1, column = 0)
+
+		# Bouton pour deséléctionné toutes les lettres
+		self.ClearLettersBtn = CTkButton(self.GameFrame, text = "Clear", fg_color = "#337292", hover_color = "#4991B6",
+			font = CTkFont(size = 25) , command = self.clear)
+		self.ClearLettersBtn.grid(row = 1, column = 1)
+
+		# Label qui va prendre en son intérieur les mots à trouver
+		self.MotATrouveFrame = CTkFrame(self.GameFrame)
+		self.MotATrouveFrame.grid(row = 2, column = 0, columnspan = 2)
+
+		# ListBox qui va afficher les mots à trouvé
+		self.var = StringVar(value = self.listeMot)
+		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 14), width = 16 ,
+			activestyle = 'none', selectbackground = "#45458B", bg = "#45458B",
+			borderwidth=0, highlightthickness=0, listvariable = self.var)
+		self.ListeBoxMotATrouver.grid(sticky = 'ensw', columnspan = 2)
+
+		# Boutton pour revenir au menu
+		self.leaveBtn = CTkButton(self.GameFrame, text = "Revenir au Menu", fg_color = "#C22955", hover_color = "#D7436D",
+			command = self.back_menu, font = CTkFont(size = 20))
+		self.leaveBtn.grid(row = 3, column = 0, columnspan = 2)
+
+		# Mot qui va changer au fur et à mesure de la partie
+		self.mot = Mot()
+
+		# génération de la map des lettres
+		for x in range(len(self.grille)):
+			for y in range(len(self.grille[0])):
+				lettre = Lettre(self.grille[x][y].upper(),x,y,self) # on initialise les lettre grâce à la classe Lettre
+				self.grille[x][y] = lettre
+				lettre.boutton.grid(row = x, column = y, padx = 5, pady = 5, sticky = 'ensw')
+
+		# Allignement principale des 2 columns, 0 = GrilleFrame et 1 = GameFrame
 		self.columnconfigure(0, weight = 2)
 		self.columnconfigure(1, weight = 1)
 		self.rowconfigure(0, weight = 1)
 
+		# Allignement vertical des lettres
 		self.GrilleFrame.columnconfigure(0, weight = 1)
 		self.GrilleFrame.columnconfigure(1, weight = 1)
 		self.GrilleFrame.columnconfigure(2, weight = 1)
@@ -63,6 +111,7 @@ class Jeu(CTk):
 		self.GrilleFrame.columnconfigure(7, weight = 1)
 		self.GrilleFrame.columnconfigure(8, weight = 1)
 
+		# Allignement horizontale des lettres
 		self.GrilleFrame.rowconfigure(0, weight = 1)
 		self.GrilleFrame.rowconfigure(1, weight = 1)
 		self.GrilleFrame.rowconfigure(2, weight = 1)
@@ -73,55 +122,14 @@ class Jeu(CTk):
 		self.GrilleFrame.rowconfigure(7, weight = 1)
 		self.GrilleFrame.rowconfigure(8, weight = 1)
 
-		"""
-
-
-		# Label Frame qui va prendre en son centre l'affichage du mot
-		self.MotLabelFrame = LabelFrame(self.GameFrame,text = "Mot", width = 250, bg = "#45458B", font = font.Font(size = 17), labelanchor = 'n')
-		self.MotLabelFrame.pack(ipadx = 20, ipady = 5, pady = 20)
-
-		# Label qui affiche le mot séléctionné
-		self.MotLabel = Label(self.MotLabelFrame,bg = "#45458B", font = font.Font(size=20),fg = "white")
-		self.MotLabel.pack()#place(x = 900, y = 200)
-
-		# Boutton pour valider la sélection des lettres
-		self.valideBtn = Button(self.GameFrame, text = "Valider", bg = "#2C8031", activebackground = "#3E9D44", fg = "white", 
-			activeforeground = "white", height = 1, font = font.Font(size = 14), command = self.valider)
-		self.valideBtn.place(x = 150, y = 170)
-
-		# Bouton pour deséléctionné toutes les lettres
-		self.ClearLettersBtn = Button(self.GameFrame,text = "Clear",bg = "#337292", activebackground = "#4991B6",fg = "white",
-			activeforeground = "white", font = font.Font(size = 14) , command = self.clear)
-		self.ClearLettersBtn.place(x = 300, y = 170)
-
-		# Label Frame qui va prendre en son intérieur les mots à trouver
-		self.MotATrouveLabelFrame = LabelFrame(self.GameFrame, text = "Mots à trouvé", font = font.Font(size = 17), bg = "#45458B")
-		self.MotATrouveLabelFrame.place(x = 150, y = 250)#pack(ipadx = 20, ipady = 10, pady = 150)
-
-		# ListBox qui va afficher les mots à trouvé
-		self.var = StringVar(value = self.listeMot)
-		self.ListeBoxMotATrouver = Listbox(self.MotATrouveLabelFrame, font = font.Font(size = 14), width = 16 ,
-			activestyle = 'none', selectbackground = "#45458B", bg = "#45458B",
-			borderwidth=0, highlightthickness=0, listvariable = self.var)
-		self.ListeBoxMotATrouver.pack()
-
-		# Boutton pour revenir au menu
-		self.leaveBtn = Button(self.GameFrame,text="Revenir au Menu",bg = "#C22955", activebackground = "#D7436D", fg = "white",
-			activeforeground = "white",command = self.back_menu, font = font.Font(size=15))
-		self.leaveBtn.place(x = 325, y = 550) # emplacement forcé sur des pixel précis
-
-		# Mot qui va changer au fur et à mesure de la partie
-		self.mot = Mot()
-		"""
-
-
-		# génération de la map des lettres
-		for x in range(len(self.grille)):
-			for y in range(len(self.grille[0])):
-				lettre = Lettre(self.grille[x][y].upper(),x,y,self) # on initialise les lettre grâce à la classe Lettre
-				self.grille[x][y] = lettre
-				lettre.boutton.grid(row = x, column = y, padx = (15,0), pady = (15,0), sticky = 'ensw')
-
+		# Allignement des bouton dans la GameFrame
+		self.GameFrame.columnconfigure(0, weight = 1)
+		self.GameFrame.columnconfigure(1, weight = 1)
+		self.GameFrame.rowconfigure(0, weight = 1)
+		self.GameFrame.rowconfigure(1, weight = 1)
+		self.GameFrame.rowconfigure(2, weight = 1)
+		self.GameFrame.rowconfigure(3, weight = 2)
+		self.GameFrame.rowconfigure(4, weight = 1)
 
 		self.mainloop() # Affichage de la fenetre
 
@@ -132,9 +140,10 @@ class Jeu(CTk):
 		self.MotLabel.configure(text = self.mot.get_mot())
 		for listeLettre in self.grille:
 			for lettre in listeLettre:
-				if lettre.isClicked and not lettre.isValid:
+				if lettre.isClicked:
 					lettre.isClicked = False
-					lettre.boutton.configure(bg = "#9090EE",activebackground="#A3A3FE")
+					lettre.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
+						hover_color = ("#BCB3E4","#746AA4"))
 
 	# Méthode Valider
 	def valider(self):
@@ -154,33 +163,33 @@ class Jeu(CTk):
 				self.var.set(self.listeMot)
 				self.mot.valider_mot()
 				if len(self.listeMot) == 0:
-					self.ERRORLABEL = Label(self.GameFrame, bg = "#45458B", fg = "green", font = font.Font(size = 20),
+					self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#459359", font = CTkFont(size = 20),
 						text = "Tu as gagné !")
-					self.ERRORLABEL.pack(side = TOP)					
+					self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 					# arreter le timer
 				else:
-					self.ERRORLABEL = Label(self.GameFrame, bg = "#45458B", fg = "green", font = font.Font(size = 20),
+					self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#459359", font = CTkFont(size = 20),
 						text = "Vous avez trouvé le mot !")
-					self.ERRORLABEL.pack(side = TOP)					
+					self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 				
 			elif mot in self.listeMotTrouve: # Si le mot est déjà trouvé
-				self.ERRORLABEL = Label(self.GameFrame, bg = "#45458B", fg = "red", font = font.Font(size = 20),
+				self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
 					text = "Mot déjà trouvé")
-				self.ERRORLABEL.pack(side = TOP)					
+				self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 			else: # Si le mot n'est pas le bon
-				self.ERRORLABEL = Label(self.GameFrame, bg = "#45458B", fg = "red", font = font.Font(size = 20),
+				self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
 					text = "Pas le bon mot :/")
-				self.ERRORLABEL.pack(side = TOP)					
+				self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		else: # Si le mot n'est pas correct
-			self.ERRORLABEL = Label(self.GameFrame, bg = "#45458B", fg = "red", font = font.Font(size = 20),
+			self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
 				text = "Le mot n'est pas valide")
-			self.ERRORLABEL.pack(side = TOP)					
+			self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
 		self.mot.clear_mot()
@@ -189,4 +198,4 @@ class Jeu(CTk):
 		
 	def back_menu(self):
 		self.destroy()
-		Menu()
+		Menu.Menu()

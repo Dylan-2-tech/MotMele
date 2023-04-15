@@ -16,9 +16,9 @@ class Mot:
 
 	def valider_mot(self):
 		for lettre in self.text:
-			lettre.isValid = True
 			lettre.isClicked = False
-			lettre.boutton.configure(bg = "green", activebackground = "#359221")
+			lettre.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
+			hover_color = ("#BCB3E4","#746AA4"), border_color = ("#51AF70","#337D4B"))
 
 	def ajouter_Lettre(self, lettre):
 		self.text.append(lettre)

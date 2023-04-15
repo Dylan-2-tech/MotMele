@@ -6,8 +6,11 @@ from customtkinter import CTkButton
 from customtkinter import CTkFont
 from customtkinter import CTkFrame
 from customtkinter import CTkLabel
+from tkinter import CENTER
 import string
 import glob
+import GameClassCTk.Jeu as Jeu
+import GameClassCTk.Creation as Creation
 
 customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
 
@@ -17,7 +20,7 @@ class Menu(CTk):
 	def __init__(self):
 		super().__init__()
 		self.title("Menu") # Titre du jeu
-		self.geometry("400x300+200+250") # Dimmension de la fenetre
+		self.geometry("400x300+800+250") # Dimmension de la fenetre
 		self.minsize(width = 350, height = 250)
 		self.maxsize(width = 450, height = 350)
 
@@ -76,7 +79,7 @@ class Menu(CTk):
 				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 			else:
 				self.destroy()
-				Jeu(self.grille)
+				Jeu.Jeu(self.grille)
 		else:
 			self.ERRORLABEL = CTkLabel(self, text = "Veuillez choisir une grille", text_color = "red", font = CTkFont(size = 15))
 			self.ERRORLABEL.place(x = 120, y = 270)
@@ -84,4 +87,4 @@ class Menu(CTk):
 
 	def go_creation(self):
 		self.destroy()
-		Creation()
+		Creation.Creation()

@@ -14,6 +14,7 @@ from tkinter import font
 import random
 import string
 import glob
+import GameClassCTk.Menu as Menu
 
 customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
 
@@ -25,7 +26,7 @@ class Creation(CTk):
 		super().__init__()
 
 		self.title("Création de grilles") # Titre du jeu
-		self.geometry("1200x700+2000+150") # Dimmension de la fenetre
+		self.geometry("1200x700+300+150") # Dimmension de la fenetre
 		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
 		self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
 
@@ -142,7 +143,7 @@ class Creation(CTk):
 
 	def back_menu(self):
 		self.destroy()
-		Menu()
+		Menu.Menu()
 
 
 	def save_grille(self):
