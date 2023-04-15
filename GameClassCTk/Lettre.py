@@ -19,7 +19,7 @@ class Lettre():
 		self.y = y # position y de la lettre
 		self.lettre = lettre
 		self.boutton = CTkButton(game.GrilleFrame, text = "".join(lettre),
-		 	font = CTkFont(size=35), command=self.clicked, border_width = 5, border_color = ("","#514683"),
+		 	font = CTkFont(size=35), command=self.clicked, border_width = 5, border_color = ("#8880A9","#514683"),
 		 	fg_color = ("#9287C7","#5F5591"), hover_color = ("#BCB3E4","#746AA4"))
 	
 	def clicked(self): # méthode qui s'active quand la lettre est cliqué

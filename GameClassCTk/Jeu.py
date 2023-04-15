@@ -52,21 +52,20 @@ class Jeu(CTk):
 
 		# Frame qui va contenir le label qui affiche le mot
 		self.MotFrame = CTkFrame(self.GameFrame)
-		self.MotFrame.grid(row = 0, column = 0, columnspan = 2, sticky = 'ew')
-		self.MotFrame.grid_propagate(0)
+		self.MotFrame.grid(row = 0, column = 0, columnspan = 2, sticky = 'we', padx = 30)
 
 		# Label qui affiche le mot séléctionné
 		self.MotLabel = CTkLabel(self.MotFrame, font = CTkFont(size=40), text = "")#,fg_color = ("","")
-		self.MotLabel.grid(row = 0, column = 0, columnspan = 2, sticky = 'ensw')
+		self.MotLabel.grid(padx = 20, pady = 15)
 
 		# Boutton pour valider la sélection des lettres
 		self.valideBtn = CTkButton(self.GameFrame, text = "Valider",fg_color = "#2C8031", hover_color = "#3E9D44", 
-			font = CTkFont(size = 25), command = self.valider)
+			font = CTkFont(size = 30), command = self.valider)
 		self.valideBtn.grid(row = 1, column = 0)
 
 		# Bouton pour deséléctionné toutes les lettres
 		self.ClearLettersBtn = CTkButton(self.GameFrame, text = "Clear", fg_color = "#337292", hover_color = "#4991B6",
-			font = CTkFont(size = 25) , command = self.clear)
+			font = CTkFont(size = 30) , command = self.clear)
 		self.ClearLettersBtn.grid(row = 1, column = 1)
 
 		# Label qui va prendre en son intérieur les mots à trouver
@@ -75,15 +74,21 @@ class Jeu(CTk):
 
 		# ListBox qui va afficher les mots à trouvé
 		self.var = StringVar(value = self.listeMot)
-		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 14), width = 16 ,
-			activestyle = 'none', selectbackground = "#45458B", bg = "#45458B",
-			borderwidth=0, highlightthickness=0, listvariable = self.var)
+		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame,
+			font = font.Font(size = 20), width = 16, activestyle = 'none',
+			selectbackground = "#525252", bg = "#3C3C3C", borderwidth=0,
+			highlightthickness=0, listvariable = self.var)
 		self.ListeBoxMotATrouver.grid(sticky = 'ensw', columnspan = 2)
 
 		# Boutton pour revenir au menu
-		self.leaveBtn = CTkButton(self.GameFrame, text = "Revenir au Menu", fg_color = "#C22955", hover_color = "#D7436D",
-			command = self.back_menu, font = CTkFont(size = 20))
+		self.leaveBtn = CTkButton(self.GameFrame, text = "Revenir au Menu",
+			fg_color = "#C22955", hover_color = "#D7436D", command = self.back_menu,
+			font = CTkFont(size = 25))
 		self.leaveBtn.grid(row = 3, column = 0, columnspan = 2)
+
+		self.ERRORLABEL = CTkLabel(self.GameFrame, font = CTkFont(size = 25),
+			text = "")
+		self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
 
 		# Mot qui va changer au fur et à mesure de la partie
 		self.mot = Mot()
@@ -131,6 +136,10 @@ class Jeu(CTk):
 		self.GameFrame.rowconfigure(3, weight = 2)
 		self.GameFrame.rowconfigure(4, weight = 1)
 
+		# Centrage du label du mot
+		self.MotFrame.rowconfigure(0, weight = 1)
+		self.MotFrame.columnconfigure(0, weight = 1)
+
 		self.mainloop() # Affichage de la fenetre
 
 
@@ -144,6 +153,9 @@ class Jeu(CTk):
 					lettre.isClicked = False
 					lettre.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
 						hover_color = ("#BCB3E4","#746AA4"))
+
+	def clear_error_message(self):
+		self.ERRORLABEL.configure(text = "")
 
 	# Méthode Valider
 	def valider(self):
@@ -163,34 +175,24 @@ class Jeu(CTk):
 				self.var.set(self.listeMot)
 				self.mot.valider_mot()
 				if len(self.listeMot) == 0:
-					self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#459359", font = CTkFont(size = 20),
-						text = "Tu as gagné !")
-					self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
-					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+					self.ERRORLABEL.configure(text_color = "#459359", text = "Gagné !")
+					self.ERRORLABEL.after(3000,self.clear_error_message)
 					# arreter le timer
 				else:
-					self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#459359", font = CTkFont(size = 20),
-						text = "Vous avez trouvé le mot !")
-					self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
-					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+					self.ERRORLABEL.configure(text_color = "#459359", text = "Vous avez trouvé le mot !")
+					self.ERRORLABEL.after(3000,self.clear_error_message)
 				
 			elif mot in self.listeMotTrouve: # Si le mot est déjà trouvé
-				self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
-					text = "Mot déjà trouvé")
-				self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL.configure(text_color = "#D31842", text = "Mot déjà trouvé")
+				self.ERRORLABEL.after(3000,self.clear_error_message)
 
 			else: # Si le mot n'est pas le bon
-				self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
-					text = "Pas le bon mot :/")
-				self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL.configure(text_color = "#D31842", text = "Pas le bon mot :/")
+				self.ERRORLABEL.after(3000,self.clear_error_message)
 
 		else: # Si le mot n'est pas correct
-			self.ERRORLABEL = CTkLabel(self.GameFrame, text_color = "#D31842", font = CTkFont(size = 20),
-				text = "Le mot n'est pas valide")
-			self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL.configure(text_color = "#D31842", text = "Le mot n'est pas valide")
+			self.ERRORLABEL.after(3000,self.clear_error_message)
 
 		self.mot.clear_mot()
 		self.clear()

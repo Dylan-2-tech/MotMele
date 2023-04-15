@@ -11,6 +11,7 @@ import string
 import glob
 import GameClassCTk.Jeu as Jeu
 import GameClassCTk.Creation as Creation
+import time
 
 customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
 
@@ -35,7 +36,7 @@ class Menu(CTk):
 
 		# Frame qui va occuper tout le haut du menu et qui va comporter la phrase de Menu
 		self.MenuFrame = CTkFrame(self,height = 75)
-		self.MenuFrame.grid(row = 0, column = 0, columnspan = 2, sticky = "WE", pady = (10,0), padx = 10)
+		self.MenuFrame.grid(row = 0, column = 0, columnspan = 2, sticky = 'we', pady = (10,0), padx = 10)
 		# Label du menu
 		self.MenuLabel = CTkLabel(self.MenuFrame, text = "Mot Mélé", font = CTkFont(size = 30))
 		self.MenuLabel.place(relx = 0.5, rely = 0.5, anchor = CENTER)

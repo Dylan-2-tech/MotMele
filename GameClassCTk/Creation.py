@@ -86,7 +86,7 @@ class Creation(CTk):
 		# List Box qui va comporter la liste de mots que le joueur doit trouver
 		self.var = StringVar(value = self.listeMot)
 		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 20), width = 14, height = 10,
-			activestyle = 'none', selectbackground = "light grey", bg = "grey", fg = "black",
+			activestyle = 'none', selectbackground = "#525252", bg = "#3C3C3C", fg = "black",
 			borderwidth=0, highlightthickness=0, listvariable = self.var)
 		self.ListeBoxMotATrouver.grid(column = 0, row = 2, columnspan = 2, padx = (20,0), pady = 20, sticky = 'ew')
 
@@ -112,6 +112,18 @@ class Creation(CTk):
 		self.leaveBtn = CTkButton(self.AffichageFrame, text="Revenir au Menu", fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"),
 			command = self.back_menu, font = CTkFont(size=20))
 		self.leaveBtn.grid(row = 2, column = 0, columnspan = 2, pady = (20,0))
+
+		# Label d'erreur de l'affichage
+		self.ERRORLABEL_AFFICHAGE = CTkLabel(self.GrilleFrame, text_color = "#C22955", font = CTkFont(size = 20),
+			text = "")
+		self.ERRORLABEL_AFFICHAGE.grid(row = 12, column = 0, columnspan = 9)
+
+		# Label d'erreur de la grille
+		self.ERRORLABEL_GRILLE = CTkLabel(self.AffichageFrame, font = CTkFont(size = 20),
+			text = "")
+		self.ERRORLABEL_GRILLE.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
+
+
 		
 		# Affichage des labels pour l'affichage des lettres de la grille
 		r = 1
@@ -137,7 +149,6 @@ class Creation(CTk):
 				c += 1
 			r += 1
 
-
 		self.mainloop()
 		
 
@@ -145,7 +156,10 @@ class Creation(CTk):
 		self.destroy()
 		Menu.Menu()
 
-
+	def clear_error_message(self):
+		self.ERRORLABEL_GRILLE.configure(text = "")
+		self.ERRORLABEL_AFFICHAGE.configure(text = "")
+	
 	def save_grille(self):
 		# vérification si un fichier existe déjà en ce nom
 		liste_de_grille = glob.glob("grille/*.txt") # Liste des fichiers texte des grilles qui apparaissent dans le répértoire
@@ -154,12 +168,9 @@ class Creation(CTk):
 
 		if len(fileName) < 4: # Si la taille du nom de la grille est inférieur à 4
 			# Label d'erreur
-			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-				text = "Minimum 4 lettres dans le nom de la grille")
-			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))					
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Minimum 4 lettres dans le nom de fichier")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 			return 1
-
 
 		for i in range(len(liste_de_grille)):
 			liste_de_grille[i] = liste_de_grille[i].replace('grille/','') # For ubuntu
@@ -196,17 +207,16 @@ class Creation(CTk):
 						self.listeMot.pop(i)
 					self.var.set(self.listeMot)
 
+				self.RRORLABEL_AFFICHAGE.configure(text_color = "#459359", text = "Grille créé")
+				self.ERRORLABEL_AFFICHAGE.after(3000,self.clear_error_message)
+
 			else:
-				self.ERRORLABEL = CTkLabel(self.AffichageFrame,text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-					text = "Générez une grille et ses mots d'abord !")
-				self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL_AFFICHAGE.configure(text_color = "#C22955", text = "Générez une grille et ses mots d'abord !")
+				self.ERRORLABEL_AFFICHAGE.after(3000,self.clear_error_message)
 		else:
 			# Label d'erreur
-			self.ERRORLABEL = CTkLabel(self.AffichageFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 18),
-				text = "Une Grille ou liste de Mot éxiste déjà avec ce nom")
-			self.ERRORLABEL.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL_AFFICHAGE.configure(text_color = "#C22955", text = "Une Grille ou liste de Mot éxiste déjà avec ce nom")
+			self.ERRORLABEL_AFFICHAGE.after(3000,self.clear_error_message)
 
 
 	def supprimer_mot(self):
@@ -216,10 +226,8 @@ class Creation(CTk):
 			self.var.set(self.listeMot) # On actualise la list box avec la nouvelle liste
 		except: # Si on ne peut pas supprimer c'est que le joueur n'as pas sélectonné un mot dans la liste box
 			# Label d'erreur
-			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-				text = "Veuillez sélectionner un mot")
-			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Veuillez sélectionner un mot")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
 
 	def add_mot(self):
@@ -234,23 +242,17 @@ class Creation(CTk):
 					self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
 				else:
 					# Label d'erreur
-					self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-						text = "Entrez un mot sans espaces")
-					self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
-					self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+					self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Entrez un mot sans espaces")
+					self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
 			else:
 				# Label d'erreur
-				self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-					text = "Nombre maximum de 10 mots")
-				self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre maximum de 10 mots")
+				self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 		else:
 			# Label d'erreur
-			self.ERRORLABEL = CTkLabel(self.GrilleFrame, text_color = ("#D7436D","#C22955"), font = CTkFont(size = 20),
-				text = "Nombre maximum de 9 lettres")
-			self.ERRORLABEL.grid(row = 12, column = 0, columnspan = 9)
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre maximum de 9 lettres")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
 
 	def space(self,entry): # Méthode qui renvoie True si il y un espace dans la chaine donner par l'entrée
@@ -305,13 +307,9 @@ class Creation(CTk):
 
 			else:
 				# Label d'erreur
-				self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-					text = "Insérez qu'une seule lettre dans chaque case")
-				self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Insérez qu'une seule lettre dans chaque case")
+				self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 		else:
 			# Label d'erreur
-			self.ERRORLABEL = Label(self.GrilleLabelFrame, bg = "#45458B", fg = "red", font = font.Font(size = 14),
-				text = "Pas d'espaces dans le nom")
-			self.ERRORLABEL.pack(side = BOTTOM, pady = 10)					
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Pas d'espaces dans le nom")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
