@@ -86,7 +86,7 @@ class Creation(CTk):
 		# List Box qui va comporter la liste de mots que le joueur doit trouver
 		self.var = StringVar(value = self.listeMot)
 		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame, font = font.Font(size = 20), width = 14, height = 10,
-			activestyle = 'none', selectbackground = "#525252", bg = "#3C3C3C", fg = "black",
+			activestyle = 'none', selectbackground = "#525252", bg = "#3C3C3C", fg = "white",
 			borderwidth=0, highlightthickness=0, listvariable = self.var)
 		self.ListeBoxMotATrouver.grid(column = 0, row = 2, columnspan = 2, padx = (20,0), pady = 20, sticky = 'ew')
 

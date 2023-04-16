@@ -77,7 +77,7 @@ class Jeu(CTk):
 		self.ListeBoxMotATrouver = Listbox(self.MotATrouveFrame,
 			font = font.Font(size = 20), width = 16, activestyle = 'none',
 			selectbackground = "#525252", bg = "#3C3C3C", borderwidth=0,
-			highlightthickness=0, listvariable = self.var)
+			highlightthickness=0, listvariable = self.var, fg = "white")
 		self.ListeBoxMotATrouver.grid(sticky = 'ensw', columnspan = 2)
 
 		# Boutton pour revenir au menu
