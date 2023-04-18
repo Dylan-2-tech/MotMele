@@ -7,6 +7,8 @@ from customtkinter import CTkFont
 from customtkinter import CTkFrame
 from customtkinter import CTkLabel
 from customtkinter import CTkEntry
+from customtkinter import CTkRadioButton
+from customtkinter import IntVar
 from tkinter import CENTER
 from tkinter import Listbox
 from tkinter import StringVar
@@ -30,8 +32,8 @@ class Creation(CTk):
 		self.minsize(width = 1200, height = 700) # Dimmension minimum de la fenetre
 		self.maxsize(width = 1200, height = 700) # Dimmension maximale de la fenetre
 
-		# Toutes les lettres de l'alphabet en majuscules
-		self.letters = string.ascii_uppercase
+		# Si diff == 1 (facile) et 2 (difficile)
+		self.diff = IntVar()
 
 		# Frame qui va contenir la grille et les options de création
 		self.GrilleFrame = CTkFrame(self,width = 450, height = 660)
@@ -60,13 +62,25 @@ class Creation(CTk):
 
 		# Boutton pour creer des grilles
 		self.CreationBoutton = CTkButton(self.GrilleFrame,text = "Générer",font = CTkFont(size = 25), fg_color = ("#3E9D44","#2C8031"),
-		 hover_color = ("#2C8031","#3E9D44"), command = self.transformer)
-		self.CreationBoutton.grid(row = 10, pady = (20,0), column = 0,columnspan = 9)
+		 hover_color = ("#2C8031","#3E9D44"), command = self.generer)
+		self.CreationBoutton.grid(row = 10, pady = (20,10), column = 0,columnspan = 5)
 	
 		# Bouton pour deséléctionné toutes les lettres
 		self.ClearLettersBtn = CTkButton(self.GrilleFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
-		 font = CTkFont(size = 20), command = self.clear)
-		self.ClearLettersBtn.grid(row = 11, pady = (20,20), column = 0, columnspan = 9)
+		 font = CTkFont(size = 25), command = self.clear)
+		self.ClearLettersBtn.grid(row = 11, pady = (10,20), column = 0, columnspan = 5)
+
+		# Boutton radio de difficulté facile
+		self.EazyRadioButton = CTkRadioButton(self.GrilleFrame, text = "Facile",
+			font = CTkFont(size = 20), hover_color = "#459359", border_color = "#459359",
+			variable = self.diff, value = 1)
+		self.EazyRadioButton.grid(row = 10, column = 4, columnspan = 5)
+
+		# Boutton radio de difficulté difficile
+		self.HardRadioButton = CTkRadioButton(self.GrilleFrame, text = "Difficile",
+			font = CTkFont(size = 20), hover_color = "#C22955", border_color = "#C22955",
+			variable = self.diff, value = 2)
+		self.HardRadioButton.grid(row = 11, column = 4, columnspan = 5)
 
 		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
 		self.MotATrouveFrame = CTkFrame(self, width = 250, height = 460)
@@ -114,14 +128,14 @@ class Creation(CTk):
 		self.leaveBtn.grid(row = 2, column = 0, columnspan = 2, pady = (20,0))
 
 		# Label d'erreur de l'affichage
-		self.ERRORLABEL_AFFICHAGE = CTkLabel(self.GrilleFrame, text_color = "#C22955", font = CTkFont(size = 20),
+		self.ERRORLABEL_AFFICHAGE = CTkLabel(self.AffichageFrame, text_color = "#C22955", font = CTkFont(size = 20),
 			text = "")
-		self.ERRORLABEL_AFFICHAGE.grid(row = 12, column = 0, columnspan = 9)
+		self.ERRORLABEL_AFFICHAGE.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
 
 		# Label d'erreur de la grille
-		self.ERRORLABEL_GRILLE = CTkLabel(self.AffichageFrame, font = CTkFont(size = 20),
+		self.ERRORLABEL_GRILLE = CTkLabel(self.GrilleFrame, font = CTkFont(size = 20),
 			text = "")
-		self.ERRORLABEL_GRILLE.grid(row = 3, column = 0, columnspan = 2, pady = (20,0))
+		self.ERRORLABEL_GRILLE.grid(row = 12, column = 0, columnspan = 9)
 
 
 		
@@ -150,7 +164,6 @@ class Creation(CTk):
 			r += 1
 
 		self.mainloop()
-		
 
 	def back_menu(self):
 		self.destroy()
@@ -207,7 +220,7 @@ class Creation(CTk):
 						self.listeMot.pop(i)
 					self.var.set(self.listeMot)
 
-				self.RRORLABEL_AFFICHAGE.configure(text_color = "#459359", text = "Grille créé")
+				self.ERRORLABEL_AFFICHAGE.configure(text_color = "#459359", text = "Grille créé")
 				self.ERRORLABEL_AFFICHAGE.after(3000,self.clear_error_message)
 
 			else:
@@ -232,26 +245,34 @@ class Creation(CTk):
 
 	def add_mot(self):
 
-		inf10 = len(self.MotEntry.get()) <= 9 # Vrai si la taille ne dépasse pas 9 lettres
+		### Toutes les conditions
+		newWord = self.MotEntry.get() not in self.listeMot # Vrai si le mot est déjà dans la liste
+		btw410 = len(self.MotEntry.get()) <= 9 and len(self.MotEntry.get()) >= 5 # Vrai si la taille ne dépasse pas 9 lettres
+		minLength = len(self.listeMot) < 10 # Vrai Si la list box n'as pas plus de 10 mots
+		spaceOrEmpty = not self.space(self.MotEntry) and not self.MotEntry.get() == "" # Si aucun mot saisi ou espace dans le mot
 
-		if inf10:
-			if len(self.listeMot) < 10: # Si la list box n'as pas plus de 10 mots
-				if not self.space(self.MotEntry) and not self.MotEntry.get() == "": # Si il n'ya pas de mots dans le
-					self.listeMot.append(self.MotEntry.get()) # Ajout du mot dans la liste des mots
-					self.MotEntry.delete(0,len(self.MotEntry.get())) # Suppression du mot de l'entrée
-					self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
+		if newWord:
+			if btw410:
+				if minLength:
+					if spaceOrEmpty:
+						self.listeMot.append(self.MotEntry.get()) # Ajout du mot dans la liste des mots
+						self.MotEntry.delete(0,len(self.MotEntry.get())) # Suppression du mot de l'entrée
+						self.var.set(self.listeMot) # Actualisation de la liste box avec la nouvelle liste
+					else:
+						# Label d'erreur
+						self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Entrez un mot sans espaces")
+						self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
+
 				else:
 					# Label d'erreur
-					self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Entrez un mot sans espaces")
+					self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre maximum de 10 mots")
 					self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
-
 			else:
 				# Label d'erreur
-				self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre maximum de 10 mots")
+				self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre de lettres entre 5 et 9")
 				self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 		else:
-			# Label d'erreur
-			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Nombre maximum de 9 lettres")
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = f"{self.MotEntry.get()} existe déjà")
 			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
 
@@ -291,7 +312,27 @@ class Creation(CTk):
 
 
 	# Méthode qui transforme la nouvelle grille en vrai grille à l'aide des entrée
-	def transformer(self):
+	def generer(self):
+
+		if self.diff.get() == 0:
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Séléctionnez une difficulté")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
+			return 1 # Quitter la méthode
+
+		elif self.diff.get() == 1 and len(self.listeMot) > 4:
+			lettres = string.ascii_uppercase
+		
+		elif self.diff.get() == 2 and len(self.listeMot) > 4:
+			lettres = []
+			for mot in self.listeMot:
+				for cara in mot:
+					if cara not in lettres:
+						lettres.append(cara.upper())
+		else:
+			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Entrez au moins 5 mots")
+			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
+			return 1 # Quitter la méthode
+
 		
 		if not self.space(self.fileName): # Si le nom ne comporte pas d'espaces
 			if not self.plus_une_lettre(): # Si il y a qu'une seule lettre dans chaque entrèe
@@ -302,7 +343,7 @@ class Creation(CTk):
 						if self.entryGrille[x][y].get() != "": # Si l'entrée n'est pas vide
 							self.nouvelleGrille[x][y] = self.entryGrille[x][y].get().upper() # affectation de chaque lettre des entrèes dans la liste
 						else:# Si l'entrèe est vide
-							self.nouvelleGrille[x][y] = self.letters[random.randint(0,25)] # Ajout d'une lettre au aléatoire dans la liste
+							self.nouvelleGrille[x][y] = lettres[random.randint(0,len(lettres)-1)] # Ajout d'une lettre au aléatoire dans la liste
 				self.affichage_grille()
 
 			else:
