@@ -47,7 +47,7 @@ class Menu(CTk):
 		self.GameButton.grid(row = 1,column = 0)
 
 		comboboxVar = customtkinter.StringVar(value = "Choisissez")
-		# List box qui va comporter les grilles que le joueur peut Charger
+		# ComboBox qui va comporter les grilles que le joueur peut Charger
 		self.GrilleComboBox = customtkinter.CTkComboBox(self, font = CTkFont(size = 18),
 			variable = comboboxVar, command = self.select_grille, values = liste_de_grille)
 		self.GrilleComboBox.grid(row = 1, column = 1)
@@ -65,6 +65,7 @@ class Menu(CTk):
 		self.mainloop()
 
 
+	# Méthode qui actalise la grille sélectionné
 	def select_grille(self,choice):
 		self.grille = choice
 
@@ -86,6 +87,7 @@ class Menu(CTk):
 			self.ERRORLABEL.place(x = 120, y = 270)
 			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
 
+	# Méthode qui lance la fenetre de création de grille
 	def go_creation(self):
 		self.destroy()
 		Creation.Creation()

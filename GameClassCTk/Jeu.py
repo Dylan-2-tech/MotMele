@@ -25,6 +25,12 @@ class Jeu(CTk):
 	def __init__(self,grille):
 		super().__init__()
 
+		# Initialisation de la fenetre du jeu
+		self.title("Mot Mélé") # Titre du jeu
+		self.geometry("1200x735+350+150") # Dimmension de la fenetre
+		self.minsize(width = 1200, height = 735) # Dimmension minimum de la fenetre
+
+
 		# Grille du jeu
 		self.grille = [line.split(',') for line  in open(f"grille/{grille}.txt")]
 		for listLettre in self.grille:
@@ -35,17 +41,13 @@ class Jeu(CTk):
 		self.listeMot = [mot.upper().split(',') for mot in open(f"mot/{grille}.txt")][0]
 		self.listeMotTrouve = [] # Liste des mot déjà trouvé
 
-		# Initialisation de la fenetre du jeu
-		self.title("Mot Mélé") # Titre du jeu
-		self.geometry("1200x735+350+150") # Dimmension de la fenetre
-		self.minsize(width = 1200, height = 735) # Dimmension minimum de la fenetre
 
 		# Frame qui va comporter la grille de jeu
 		self.GrilleFrame = CTkFrame(self)
 		self.GrilleFrame.grid(sticky = 'ewns', column = 0, row = 0, pady = 20, padx = 20)
 		self.GrilleFrame.grid_propagate(0)
 
-		# Frame qui va comporter tout les boutons pour valider etc
+		# Frame qui va comporter tout les bouttons pour valider etc
 		self.GameFrame = CTkFrame(self)
 		self.GameFrame.grid(sticky = 'ensw', column = 1, row = 0, padx = (0,20), pady = 20)
 		self.GameFrame.grid_propagate(0)
@@ -86,6 +88,7 @@ class Jeu(CTk):
 			font = CTkFont(size = 25))
 		self.leaveBtn.grid(row = 3, column = 0, columnspan = 2)
 
+		# Label d'erreur
 		self.ERRORLABEL = CTkLabel(self.GameFrame, font = CTkFont(size = 25),
 			text = "")
 		self.ERRORLABEL.grid(row = 4, column = 0, columnspan = 2)
@@ -154,6 +157,7 @@ class Jeu(CTk):
 					lettre.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
 						hover_color = ("#BCB3E4","#746AA4"))
 
+	# Méthode qui efface le texte des erreurs
 	def clear_error_message(self):
 		self.ERRORLABEL.configure(text = "")
 
@@ -197,7 +201,7 @@ class Jeu(CTk):
 		self.mot.clear_mot()
 		self.clear()
 
-		
+	# Méthode qui reviens au menu
 	def back_menu(self):
 		self.destroy()
 		Menu.Menu()

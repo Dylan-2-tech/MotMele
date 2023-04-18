@@ -20,9 +20,14 @@ class Mot:
 			lettre.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
 			hover_color = ("#BCB3E4","#746AA4"), border_color = ("#51AF70","#337D4B"))
 
+	# Méthode qui ajoute la lettre cliqué dans la liste qui représente le texte
 	def ajouter_Lettre(self, lettre):
 		self.text.append(lettre)
 
+	def supprimer_Lettre(self, lettre):
+		self.text = [self.text[i] for i in range(len(self.text)) if lettre != self.text[i]] # On retire la lettre du mot
+
+	# Méthode qui vérifie si le mot sélectionné par le joueur est correct
 	def mot_correct(self):
 		"""Renvoie True si chaque lettre du mot suivent la même direction.
 
@@ -54,7 +59,7 @@ class Mot:
 		else: # Si le mot est composé de qu'une seule lettre
 			return False
 	
-
+	# Retourne vrai si le mot est dans la direction horizontale
 	def mot_horizontal(self):
 		# Si toutes les lettres sont positionné horizontalement
 
@@ -74,6 +79,7 @@ class Mot:
 		else: # Sinon
 			return False # On retourne False
 
+	# Retourne vrai si le mot est dans la direction vertical
 	def mot_vertical(self):
 		# Si toutes les lettres sont positionné verticalement
 
@@ -93,6 +99,7 @@ class Mot:
 		else: # Sinon
 			return False # On retourne False
 
+	# Retourne vrai si le mot est dans la direction diagonale de gauch à droite
 	def mot_diagonale_gauche_droite(self):
 		# Si toutes les lettres sont positionnées en diagonale de à gauche à droite
 
@@ -113,6 +120,7 @@ class Mot:
 		else: # Sinon
 			return False # On retourne False
 
+	# Retourne vrai si le mot est dans la direction diagonale de droite à gauche
 	def mot_diagonale_droite_gauche(self):
 		# Si toutes les lettres sont positionnées en diagonale de droite à gauche
 

@@ -21,14 +21,15 @@ class Lettre():
 		self.boutton = CTkButton(game.GrilleFrame, text = "".join(lettre),
 		 	font = CTkFont(size=35), command=self.clicked, border_width = 5, border_color = ("#8880A9","#514683"),
 		 	fg_color = ("#9287C7","#5F5591"), hover_color = ("#BCB3E4","#746AA4"))
-	
-	def clicked(self): # méthode qui s'active quand la lettre est cliqué
+
+	# méthode qui s'active quand la lettre est cliqué
+	def clicked(self):
 
 		if self.isClicked: # Si la lettre est déjà cliqué
 			self.boutton.configure(fg_color = ("#9287C7","#5F5591"), 
-			hover_color = ("#BCB3E4","#746AA4")) # On remet une couleur par défaut 
+				hover_color = ("#BCB3E4","#746AA4")) # On remet une couleur par défaut 
 			self.isClicked = False # Elle devient plus cliqué
-			self.mot.text = [self.mot.text[i] for i in range(len(self.mot.text)) if self != self.mot.text[i]] # On retire la lettre du mot
+			self.mot.supprimer_Lettre(self)
 			self.MotLabel.configure(text = self.mot) # Affichage du mot en cours
 		
 		else: # Si la lettre est pas encore cliqué

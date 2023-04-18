@@ -37,12 +37,12 @@ class Creation(CTk):
 
 		# Frame qui va contenir la grille et les options de création
 		self.GrilleFrame = CTkFrame(self,width = 450, height = 660)
-		self.GrilleFrame.grid(row = 0, column = 0, sticky = 'nwe', rowspan = 2, padx = 20, pady = 20)
+		self.GrilleFrame.grid(row = 0, column = 0, sticky = 'nwes', rowspan = 2, padx = 20, pady = 20)
 		self.GrilleFrame.grid_propagate(0)
 
-		# Double liste des entré qui vont prendre les lettre du joueur pour créer la grille
+		# Double liste des entrés qui vont prendre les lettres du joueur pour créer la grille
 		self.entryGrille = [[CTkEntry(self.GrilleFrame,font = CTkFont(size = 25), width = 2, corner_radius = 10) for i in range(9)] for i in range(9)]
-		# Double liste de charactère vide qui représente la grille que le joueur va créer
+		# Double liste de charactères vide qui représente la grille que le joueur va créer
 		self.nouvelleGrille = [["" for i in range(9)] for i in range(9)]
 		# Liste des mots que le joueur veut ajouter
 		self.listeMot = []
@@ -56,7 +56,7 @@ class Creation(CTk):
 		self.nomLabel = CTkLabel(self.nomFrame, text = "Nom:", font = CTkFont(size = 15))
 		self.nomLabel.grid(row = 0, column = 0, padx = (100,0), pady = (10,0))
 
-		# Entry qui va prendre le nom de la grille que le joueur veut créer
+		# Entré qui va prendre le nom de la grille que le joueur veut créer
 		self.fileName = CTkEntry(self.nomFrame, font = CTkFont(size = 15))
 		self.fileName.grid(row = 0, column = 1, padx = (10,0), pady = (10,0))
 
@@ -65,7 +65,7 @@ class Creation(CTk):
 		 hover_color = ("#2C8031","#3E9D44"), command = self.generer)
 		self.CreationBoutton.grid(row = 10, pady = (20,10), column = 0,columnspan = 5)
 	
-		# Bouton pour deséléctionné toutes les lettres
+		# Boutton pour deséléctionné toutes les lettres de la grille
 		self.ClearLettersBtn = CTkButton(self.GrilleFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
 		 font = CTkFont(size = 25), command = self.clear)
 		self.ClearLettersBtn.grid(row = 11, pady = (10,20), column = 0, columnspan = 5)
@@ -82,7 +82,7 @@ class Creation(CTk):
 			variable = self.diff, value = 2)
 		self.HardRadioButton.grid(row = 11, column = 4, columnspan = 5)
 
-		# LabelFrame qui va comprendre la liste box des mots à trouver dans la grille
+		# Frame qui va comprendre la liste box des mots à trouver dans la grille
 		self.MotATrouveFrame = CTkFrame(self, width = 250, height = 460)
 		self.MotATrouveFrame.grid(row = 0,column = 1,padx = (0,20))
 		self.MotATrouveFrame.grid_propagate(0)
@@ -104,12 +104,12 @@ class Creation(CTk):
 			borderwidth=0, highlightthickness=0, listvariable = self.var)
 		self.ListeBoxMotATrouver.grid(column = 0, row = 2, columnspan = 2, padx = (20,0), pady = 20, sticky = 'ew')
 
-		# LabelFrame qui va contenir l'affichage de la grille généré par le joueur
+		# Frame qui va contenir l'affichage de la grille généré par le joueur
 		self.AffichageFrame = CTkFrame(self, width = 425, height = 660)
 		self.AffichageFrame.grid(row = 0, column = 2, pady = 20, sticky = 'we')
 		self.AffichageFrame.grid_propagate(0)
 
-		# Frame on va apparaitre la grille
+		# Frame où va apparaitre la grille
 		self.GrilleAffichageFrame = CTkFrame(self.AffichageFrame, width = 400, height = 470)
 		self.GrilleAffichageFrame.grid(row = 0, columnspan = 2, padx = (10,0), pady = 10)
 		self.GrilleAffichageFrame.grid_propagate(0)
@@ -138,7 +138,6 @@ class Creation(CTk):
 		self.ERRORLABEL_GRILLE.grid(row = 12, column = 0, columnspan = 9)
 
 
-		
 		# Affichage des labels pour l'affichage des lettres de la grille
 		r = 1
 		for listeLabel in self.lettreLabelListe:
@@ -165,14 +164,17 @@ class Creation(CTk):
 
 		self.mainloop()
 
+	# Méthode de retour vers le menu
 	def back_menu(self):
 		self.destroy()
 		Menu.Menu()
 
+	# Méthode qui efface les erreurs
 	def clear_error_message(self):
 		self.ERRORLABEL_GRILLE.configure(text = "")
 		self.ERRORLABEL_AFFICHAGE.configure(text = "")
 	
+	# Méthode qui enregistre la grille créée en format txt
 	def save_grille(self):
 		# vérification si un fichier existe déjà en ce nom
 		liste_de_grille = glob.glob("grille/*.txt") # Liste des fichiers texte des grilles qui apparaissent dans le répértoire
@@ -232,6 +234,7 @@ class Creation(CTk):
 			self.ERRORLABEL_AFFICHAGE.after(3000,self.clear_error_message)
 
 
+	# Méthode qui supprime le mot sélectionné
 	def supprimer_mot(self):
 		
 		try:
@@ -243,6 +246,7 @@ class Creation(CTk):
 			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
 
+	# Méthode qui ajoute le mot quand l'utilisateur appuie sur entrée
 	def add_mot(self):
 
 		### Toutes les conditions
@@ -275,7 +279,7 @@ class Creation(CTk):
 			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = f"{self.MotEntry.get()} existe déjà")
 			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 
-
+	# Méthode qui renvoie True si il y a des espaces dans le l'entrée en parametre
 	def space(self,entry): # Méthode qui renvoie True si il y un espace dans la chaine donner par l'entrée
 		text = entry.get() # Récupération de la chaine de caractère
 		indc = 0
@@ -314,26 +318,30 @@ class Creation(CTk):
 	# Méthode qui transforme la nouvelle grille en vrai grille à l'aide des entrée
 	def generer(self):
 
+		# Si aucune difficulté est choisie
 		if self.diff.get() == 0:
 			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Séléctionnez une difficulté")
 			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 			return 1 # Quitter la méthode
 
+		# Si la difficulté facile est choisie et qu'il y a 5 mots minimum 
 		elif self.diff.get() == 1 and len(self.listeMot) > 4:
 			lettres = string.ascii_uppercase
 		
+		# Si la difficulté difficile est choisie et qu'il y a 5 mots minimum 
 		elif self.diff.get() == 2 and len(self.listeMot) > 4:
 			lettres = []
 			for mot in self.listeMot:
 				for cara in mot:
 					if cara not in lettres:
 						lettres.append(cara.upper())
+		
+		# S'il n'y a pas de minimu 5 mots
 		else:
 			self.ERRORLABEL_GRILLE.configure(text_color = "#C22955", text = "Entrez au moins 5 mots")
 			self.ERRORLABEL_GRILLE.after(3000,self.clear_error_message)
 			return 1 # Quitter la méthode
 
-		
 		if not self.space(self.fileName): # Si le nom ne comporte pas d'espaces
 			if not self.plus_une_lettre(): # Si il y a qu'une seule lettre dans chaque entrèe
 
