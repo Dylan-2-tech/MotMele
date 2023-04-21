@@ -64,7 +64,7 @@ class Creation(CTk):
 		self.CreationBoutton = CTkButton(self.GrilleFrame,text = "Générer",font = CTkFont(size = 25), fg_color = ("#3E9D44","#2C8031"),
 		 hover_color = ("#2C8031","#3E9D44"), command = self.generer)
 		self.CreationBoutton.grid(row = 10, pady = (20,10), column = 0,columnspan = 5)
-	
+		
 		# Boutton pour deséléctionné toutes les lettres de la grille
 		self.ClearLettersBtn = CTkButton(self.GrilleFrame,text = "Clear",fg_color = "#337292", hover_color = "#4991B6",
 		 font = CTkFont(size = 25), command = self.clear)

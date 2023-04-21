@@ -6,4 +6,5 @@ from GameClassCTk.Jeu import Jeu
 
 
 #### Lancement du jeu ####
-Jeu = Creation()
+
+Jeu = Menu()

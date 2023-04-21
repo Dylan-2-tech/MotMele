@@ -1,9 +1,0 @@
-L,F,F,Z,N,M,A,D,R
-S,R,E,V,I,N,U,I,E
-J,E,U,U,V,F,O,Q,V
-Y,I,L,G,H,N,T,X,E
-F,V,R,I,U,P,Q,H,N
-Q,A,B,D,H,E,P,A,U
-L,L,C,E,S,A,U,D,V
-J,C,O,M,P,A,S,X,M
-A,J,M,D,R,U,V,G,W

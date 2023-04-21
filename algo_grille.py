@@ -26,11 +26,17 @@ with open('../mot/liste_mots.txt', 'w') as f:
 """
 
 
-grille = [["" for i in range(9)] for i in range(9)]
-
 def affichage_grille(g):
 
 	for listeLettre in grille:
 		print(listeLettre)
 
+grille = [["" for i in range(9)] for i in range(9)]
+liste_mot = ["manger","siffler","caillou"]
+
 affichage_grille(grille)
+
+def recursive_search_vert_gd(grille, taille):
+	
+
+def placer_mot_vertical_gd(grille,mot):

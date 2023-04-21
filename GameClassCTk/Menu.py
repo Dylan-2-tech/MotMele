@@ -12,6 +12,7 @@ import glob
 import GameClassCTk.Jeu as Jeu
 import GameClassCTk.Creation as Creation
 import time
+import os
 
 customtkinter.set_appearance_mode("dark") # Thème général de l'application (dark, light, system)
 
@@ -26,13 +27,13 @@ class Menu(CTk):
 		self.maxsize(width = 450, height = 350)
 
 		# Présentation des grilles du jeu dans la comboBox
-		liste_de_grille = glob.glob("grille/*.txt")
+		self.liste_de_grille = glob.glob("grille/*.txt")
 		self.grille = ""
 
-		for i in range(len(liste_de_grille)):
-			liste_de_grille[i] = liste_de_grille[i].replace('grille/','') # Ubuntu
-			liste_de_grille[i] = liste_de_grille[i].replace('grille\\','') # Windows
-			liste_de_grille[i] = liste_de_grille[i].replace('.txt','')
+		for i in range(len(self.liste_de_grille)):
+			self.liste_de_grille[i] = self.liste_de_grille[i].replace('grille/','') # Ubuntu
+			self.liste_de_grille[i] = self.liste_de_grille[i].replace('grille\\','') # Windows
+			self.liste_de_grille[i] = self.liste_de_grille[i].replace('.txt','')
 
 		# Frame qui va occuper tout le haut du menu et qui va comporter la phrase de Menu
 		self.MenuFrame = CTkFrame(self,height = 75)
@@ -44,28 +45,78 @@ class Menu(CTk):
 		# Boutton qui permet de fermer la fenetre du menu et de lancer le jeu
 		self.GameButton = CTkButton(self,text = "JOUER", font = CTkFont(size = 25), 
 			fg_color = ("#8177B4","#6E64A2"), hover_color = ("#6E64A2","#8177B4"), command = self.launch_game)
-		self.GameButton.grid(row = 1,column = 0)
+		self.GameButton.grid(row = 1,column = 0, pady = (20,0))
 
-		comboboxVar = customtkinter.StringVar(value = "Choisissez")
+		# Boutton pour supprimer la grille séléctionné
+		self.suppGrille = CTkButton(self, text = "Supprimer", font = CTkFont(size = 20),
+			fg_color = ("#D7436D","#C22955"), hover_color = ("#C22955","#D7436D"), command = self.delete_grille)
+		self.suppGrille.grid(row = 2, column = 0)
+
+		self.comboboxVar = customtkinter.StringVar(value = "Choisissez")
 		# ComboBox qui va comporter les grilles que le joueur peut Charger
 		self.GrilleComboBox = customtkinter.CTkComboBox(self, font = CTkFont(size = 18),
-			variable = comboboxVar, command = self.select_grille, values = liste_de_grille)
-		self.GrilleComboBox.grid(row = 1, column = 1)
+			variable = self.comboboxVar, command = self.select_grille, values = self.liste_de_grille)
+		self.GrilleComboBox.grid(row = 1, column = 1, rowspan = 2)
 
 		# Boutton pour accéder à la page de création de Grilles
 		self.CreationBoutton = CTkButton(self,text = "Creer",font = CTkFont(size = 20), command = self.go_creation,
 			fg_color = ("#448784","#3B706E"), hover_color = ("#3B706E","#448784")) #self.go_creation
-		self.CreationBoutton.grid(pady = (0,50), row = 2, columnspan = 2)
-	
+		self.CreationBoutton.grid(pady = (0,20), row = 3, columnspan = 2)
+
+		# Label d'erreur
+		self.ERRORLABEL = CTkLabel(self, text = "", text_color ="#C22955",
+			font = CTkFont(size = 15))
+		self.ERRORLABEL.grid(row = 4, columnspan = 2)
+
 		# Configuration de l'adaptation de la page principale
-		self.rowconfigure(1,weight = 1)
+		self.rowconfigure(1, weight = 1)
+		self.rowconfigure(2, weight = 1)
+		self.rowconfigure(3, weight = 1)
 		self.columnconfigure(0, weight = 1)
 		self.columnconfigure(1, weight = 1)
 
 		self.mainloop()
 
+	# Méthode pour supprimer la grille séléctionné
+	def delete_grille(self):
 
-	# Méthode qui actalise la grille sélectionné
+		if self.grille == '':
+			# Affichage du label de l'erreur
+			self.ERRORLABEL.configure(text = "Veuillez choisir une grille", text_color = "#C22955")
+			return 1
+
+		try: # Suppression du fichier choisis
+			os.remove(f'grille/{self.grille}.txt')
+			os.remove(f'mot/{self.grille}.txt')
+
+			# Actalisation de la comboBox
+			self.delete_grille_liste()
+			self.GrilleComboBox["value"] = self.liste_de_grille
+
+		except FileNotFoundError: # Exception si le fichier existe plus
+			self.ERRORLABEL.configure(text = "La grille n'existe plus", text_color = "#C22955")
+			self.ERRORLABEL.after(3000,self.clear_error_message)
+
+		else: # Sinon 
+			self.ERRORLABEL.configure(text = "Grille supprimé", text_color = "#459359")
+			self.ERRORLABEL.after(3000,self.clear_error_message)
+
+	def delete_grille_liste(self):
+
+		indG = 0
+		trouve = False
+
+		while not trouve and indG < len(self.liste_de_grille):
+			trouve = self.liste_de_grille[indG] == self.grille
+			print(trouve)
+			indG += 1
+
+
+	# Meéthode qui supprime le texte du label d'erreur
+	def clear_error_message(self):
+		self.ERRORLABEL.configure(text = "")
+
+	# Méthode qui actualise la grille sélectionné
 	def select_grille(self,choice):
 		self.grille = choice
 
@@ -76,16 +127,14 @@ class Menu(CTk):
 
 			if glob.glob(f"mot/{self.grille}.txt") == []: # Si la grille n'a pas de mot
 				# Affichage du label de l'erreur
-				self.ERRORLABEL = CTkLabel(self, text = "La grille n'a pas de mots attitrés", text_color = "red", font = CTkFont(size = 15))
-				self.ERRORLABEL.place(x = 100, y = 270)
-				self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+				self.ERRORLABEL.configure(text = "La grille n'a pas de mots attitrés", text_color = "#C22955") 
+				self.ERRORLABEL.after(3000,self.clear_error_message)
 			else:
 				self.destroy()
 				Jeu.Jeu(self.grille)
 		else:
-			self.ERRORLABEL = CTkLabel(self, text = "Veuillez choisir une grille", text_color = "red", font = CTkFont(size = 15))
-			self.ERRORLABEL.place(x = 120, y = 270)
-			self.ERRORLABEL.after(3000,self.ERRORLABEL.destroy)
+			self.ERRORLABEL.configure(text = "Veuillez choisir une grille", text_color = "#C22955")
+			self.ERRORLABEL.after(3000,self.clear_error_message)
 
 	# Méthode qui lance la fenetre de création de grille
 	def go_creation(self):
