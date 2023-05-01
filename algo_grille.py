@@ -38,74 +38,74 @@ liste_mot = ["manger","siffler","caillou"]
 grille[3][6] = 'T'
 affichage_grille(grille)
 
-
+#### Fonctions qui placent le mot dans la grille de 4 manière différentes ####
 # Fonction qui place un mot donner à la verticale
 def search_vert(mot, x, y):
 	liste_positions = []
 	indC = 0
 
-	while grille[y][x] == "" and indC < len(mot):
-		liste_positions.append((x,y))
-		indC += 1
-		if y < len(grille)-1:
+	while indC < len(mot):
+		if y < len(grille) and grille[y][x] == "":
+			liste_positions.append((x,y))
+			indC += 1
 			y += 1
-
-	if indC == len(mot):
-		placer_mot(mot, liste_positions)
-		return True
-	else:
-		return False
+		else:
+			print("Le mot dépasse les limites de la grille")
+			return False
+	
+	placer_mot(mot, liste_positions)
+	return True
 # Fonction qui place un mot donner à l'horizontale
 def search_hori(mot, x, y):
 	liste_positions = []
 	indC = 0
 
-	while grille[y][x] == "" and indC < len(mot):
-		liste_positions.append((x,y))
-		indC += 1
-		if x < len(grille[0])-1:
+	while indC < len(mot):
+		if x < len(grille[0]) and grille[y][x] == "":
+			liste_positions.append((x,y))
+			indC += 1
 			x += 1
-
-
-	if indC == len(mot):
-		placer_mot(mot, liste_positions)
-		return True
-	else:
-		return False
+		else:
+			print("Le mot dépasse les limites de la grille")
+			return False
+	
+	placer_mot(mot, liste_positions)
+	return True
 # Fonction qui place un mot donner en diagonale de gauche à droite
 def search_diag_gd(mot, x, y):
 	liste_positions = []
 	indC = 0
 
-	while grille[y][x] == "" and indC < len(mot):
-		liste_positions.append((x,y))
-		indC += 1
-		if y < len(grille)-1 and x < len(grille[0])-1:
+	while indC < len(mot):
+		if x < len(grille[0]) and y < len(grille) and grille[y][x] == "":
+			liste_positions.append((x,y))
+			indC += 1
 			y += 1
 			x += 1
-
-	if indC == len(mot):
-		placer_mot(mot, liste_positions)
-		return True
-	else:
-		return False
+		else:
+			print("Le mot dépasse les limites de la grille")
+			return False
+	
+	placer_mot(mot, liste_positions)
+	return True
 # Fonction qui place un mot donner en diagonale de droite à gauche
 def search_diag_dg(mot, x, y):
 	liste_positions = []
 	indC = 0
 
-	while grille[y][x] == "" and indC < len(mot):
-		liste_positions.append((x,y))
-		indC += 1
-		if y < len(grille)-1 and x > 0:
+	while indC < len(mot):
+		if x >= 0 and y < len(grille) and grille[y][x] == "":
+			liste_positions.append((x,y))
+			indC += 1
 			y += 1
 			x -= 1
+		else:
+			print("Le mot dépasse les limites de la grille")
+			return False
+	
+	placer_mot(mot, liste_positions)
+	return True
 
-	if indC == len(mot):
-		placer_mot(mot, liste_positions)
-		return True
-	else:
-		return False
 # Fonction pour placer les lettres du mot au positions voulu
 def placer_mot(mot, liste_positions):
 	# On parcours les position et on place chaque lettre du mot
@@ -119,8 +119,8 @@ def placer_mot(mot, liste_positions):
 		# Affectation des lettres du mot dans les cases vides de la grille
 		grille[y][x] = mot[i]
 
-print(search_diag_gd("manger", 0, 0))
-#print(search_hori("oui", 1, 2))
+print(search_diag_gd("manger", 0, 3))
+print(search_vert("voir", 5, 4))
 affichage_grille(grille)
 
 '''
