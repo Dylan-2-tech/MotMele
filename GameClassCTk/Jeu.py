@@ -61,7 +61,7 @@ class Jeu(CTk):
 		self.MotLabel.grid(padx = 20, pady = 15)
 
 		# Boutton pour valider la sélection des lettres
-		self.valideBtn = CTkButton(self.GameFrame, text = "Valider",fg_color = "#2C8031", hover_color = "#3E9D44", 
+		self.valideBtn = CTkButton(self.GameFrame, text = "Valider", fg_color = "#2C8031", hover_color = "#3E9D44", 
 			font = CTkFont(size = 30), command = self.valider)
 		self.valideBtn.grid(row = 1, column = 0)
 
