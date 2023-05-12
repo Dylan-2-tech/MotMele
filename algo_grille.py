@@ -174,18 +174,60 @@ def search_diag_dg_inv(mot, x, y):
 	placer_mot(mot, liste_positions)
 	return True
 
-"""
-# Fonction qui place un mot en croisé avec un mot déjà dans la grille
-def search_vert_croisee(mot):
+# Fonction qui retourne sous forme de liste les positions de la lettre dans le mot entré en paramètres
+def search_lettre_ind(mot, lettre):
 
-	# Recherche de la lettre à croisée en parcourant la grille
-"""
+	positions = []
+
+	for i in range(len(mot)):
+		if mot[i] == lettre:
+			positions.append(i)
+
+	return positions
+
+
+def search_vert_croise(mot, positions):
+
+	for l, p in positions.items():
+		spaceOver = p[1]
+		spaceBelow = len(grille)-(p[1]+1)
+
+		indice = search_lettre_ind(mot, l)
+
+		lenOver = len(mot)-(len(mot)-indice[0])
+		lenBelow = (len(mot)-indice[0])-1
+
+		print(f"Espace libre au dessus puis en dessous de {l}: ({spaceOver},{spaceBelow})")
+		print(f"Le mot requiert une place minimum de ({lenOver},{lenBelow}) pour être verticale")
+
+		# Condition pour pouvoir placer le mot à la verticale dans l'ordre
+		if lenOver <= spaceOver and lenBelow <= spaceBelow:
+			search_vert(mot, p[0], spaceOver-lenOver)
+		
+		#print(l, search_lettre_ind(mot, l), p)
+
+
+
+# Fonction qui recherche un endroit ou croisé le mot
+def search_croise(mot):
+
+	positions = {}
+
+	# Parcours de la grille
+	for y in range(len(grille)):
+		for x in range(len(grille[0])):
+			# Si la lettre est dans le mot à placé
+			if grille[y][x] in mot and grille[y][x] != "":
+				positions[grille[y][x]] = (x,y)
+
+	print(positions)
+
+	search_vert_croise(mot, positions)
+	
 
 # Fonction pour placer les lettres du mot au positions voulu
 def placer_mot(mot, liste_positions):
 	# On parcours les position et on place chaque lettre du mot
-	print(liste_positions)
-
 	for i in range(len(liste_positions)):
 		# Récupération des positions
 		x = liste_positions[i][0]
@@ -194,9 +236,12 @@ def placer_mot(mot, liste_positions):
 		# Affectation des lettres du mot dans les cases vides de la grille
 		grille[y][x] = mot[i]
 
-print(search_diag_dg_inv("manger", 3, 5))
+print(search_diag_dg("mamger", 6, 1))
+search_croise("pagaille")
+search_vert("rie", 1, 6)
+#search_croise("rie")
 #print(search_hori_inv("voir", 3, 8))
-#print(search_vert_inv("paille", 5, 5))
+#print(search_vert_inv("paille", 4, 5))
 #print(search_diag_dg("grange", 8, 1))
 affichage_grille(grille)
 
